@@ -15,9 +15,6 @@ function App() {
       <Router>
         <div className="container mx-auto mb-8 px-8">
           <Header />
-          <h1 className="mt-8 text-center text-3xl font-bold">
-            Welcome To Word Mind App. Be ready to learn fucking words quickly :D
-          </h1>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/decks" element={<Deck />} />
@@ -33,8 +30,13 @@ function App() {
 
 function Home() {
   return (
-    <div>
-      {/* Your Home component content */}
+    <div className="mt-8 text-center">
+      <h1 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold">
+        Welcome To Word Mind App.
+      </h1>
+      <p className="mt-4 text-sm md:text-base lg:text-lg xl:text-xl">
+        Be ready to learn amazing words quickly :D
+      </p>
     </div>
   );
 }
