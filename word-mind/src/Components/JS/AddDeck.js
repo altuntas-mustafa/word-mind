@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { collection, addDoc, doc, setDoc, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
-import "../CSS/AddDeck.css";
 
 const AddDeck = () => {
   const [deckInfo, setDeckInfo] = useState({

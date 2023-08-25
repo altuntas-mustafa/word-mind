@@ -3,7 +3,6 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
 import { useParams, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import "../CSS/FlashCards.css";
 
 const Flashcards = () => {
   const { deckName, language } = useParams();

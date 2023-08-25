@@ -5,7 +5,6 @@ import { db } from "../../firebase/firebase";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setOrder, setDisplayOrder } from "../../redux/reducers";
-import "../CSS/Deck.css"; // Update the import path
 
 const Deck = () => {
   const [languages, setLanguages] = useState([]);
