@@ -54,48 +54,50 @@ const Deck = () => {
   }, []);
 
   return (
-    <div className="deck-container">
-      <h1 className="deck-title">Language Page</h1>
-      <div className="options">
-        <div className="toggle-container">
-          <label>
-            Random Order:{" "}
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Language Page</h1>
+      <div className="flex space-x-4 mb-4">
+        <div className="flex items-center">
+          <label className="flex items-center space-x-2">
             <input
               type="checkbox"
+              className="form-checkbox"
               checked={isRandomOrder}
               onChange={() => dispatch(setOrder(!isRandomOrder))}
             />
+            <span>Random Order</span>
           </label>
-          <label>
-            Random Sidee:{" "}
+        </div>
+        <div className="flex items-center">
+          <label className="flex items-center space-x-2">
             <input
               type="checkbox"
+              className="form-checkbox"
               checked={isFrontDisplayed}
               onChange={() => dispatch(setDisplayOrder(!isFrontDisplayed))}
             />
+            <span>Random Side</span>
           </label>
         </div>
       </div>
-      <div className="language-list-container">
-        <ul className="language-list">
-          {languages.map((language) => (
-            <li key={language.id} className="language-item">
-              <h2 className="language-name">{language.id}</h2>
-              <ul className="deck-list">
-                {language.decks.map((deck) => (
-                  <li key={deck.id} className="deck-item">
-                    <Link
-                      to={`/languages/${encodeURIComponent(language.id)}/decks/${encodeURIComponent(deck.name)}`}
-                      className="deck-link"
-                    >
-                      {deck.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ul>
+      <div className="space-y-4">
+        {languages.map((language) => (
+          <div key={language.id}>
+            <h2 className="text-xl font-semibold mb-2">{language.id}</h2>
+            <ul className="space-y-2">
+              {language.decks.map((deck) => (
+                <li key={deck.id}>
+                  <Link
+                    to={`/languages/${encodeURIComponent(language.id)}/decks/${encodeURIComponent(deck.name)}`}
+                    className="text-blue-500 hover:underline"
+                  >
+                    {deck.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </div>
     </div>
   );
