@@ -6,6 +6,7 @@ import Deck from './Components/JS/Deck';
 import Flashcards from './Components/JS/Flashcards';
 import './App.css';
 import AddDeck from './Components/JS/AddDeck';
+import ChatGpt from './ExternalApi/ChatGpt';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/decks" element={<Deck />} />
             <Route path="/createdecks" element={<AddDeck />} />
+            <Route path="/chatgpt" element={<ChatGpt />} />
             <Route path="/languages/:language/decks/:deckName" element={<Flashcards />} /> {/* Update this route */}
             </Routes>
       <li>
