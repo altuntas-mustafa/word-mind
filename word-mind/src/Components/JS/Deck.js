@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
 import { Link } from "react-router-dom";
@@ -54,39 +53,39 @@ const Deck = () => {
   }, []);
 
   return (
-    <div className="deck-container">
-      <h1 className="deck-title">Language Page</h1>
-      <div className="options">
+    <div className="deck-container bg-gray-100 p-4 flex flex-col items-center mt-12">
+      <h1 className="deck-title text-3xl font-bold mb-4">Language Page</h1>
+      <div className="options mb-4">
         <div className="toggle-container">
-          <label>
-            Random Order:{" "}
+          <label className="flex items-center space-x-2">
             <input
               type="checkbox"
               checked={isRandomOrder}
               onChange={() => dispatch(setOrder(!isRandomOrder))}
             />
+            <span className="text-sm">Random Order</span>
           </label>
-          <label>
-            Random Sidee:{" "}
+          <label className="flex items-center space-x-2">
             <input
               type="checkbox"
               checked={isFrontDisplayed}
               onChange={() => dispatch(setDisplayOrder(!isFrontDisplayed))}
             />
+            <span className="text-sm">Random Side</span>
           </label>
         </div>
       </div>
       <div className="language-list-container">
         <ul className="language-list">
           {languages.map((language) => (
-            <li key={language.id} className="language-item">
-              <h2 className="language-name">{language.id}</h2>
+            <li key={language.id} className="language-item mb-4">
+              <h2 className="language-name text-lg font-semibold">{language.id}</h2>
               <ul className="deck-list">
                 {language.decks.map((deck) => (
                   <li key={deck.id} className="deck-item">
                     <Link
                       to={`/languages/${encodeURIComponent(language.id)}/decks/${encodeURIComponent(deck.name)}`}
-                      className="deck-link"
+                      className="deck-link text-blue-500 hover:underline"
                     >
                       {deck.name}
                     </Link>
