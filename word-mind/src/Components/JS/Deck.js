@@ -53,24 +53,41 @@ const Deck = () => {
   }, []);
 
   return (
+<<<<<<< HEAD
     <div className="deck-container bg-gray-100 p-4 flex flex-col items-center mt-12">
       <h1 className="deck-title text-3xl font-bold mb-4">Language Page</h1>
       <div className="options mb-4">
         <div className="toggle-container">
+=======
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Language Page</h1>
+      <div className="flex space-x-4 mb-4">
+        <div className="flex items-center">
+>>>>>>> 7b1ef0ffc2cca39dacfd78b65693d4f01703db88
           <label className="flex items-center space-x-2">
             <input
               type="checkbox"
+              className="form-checkbox"
               checked={isRandomOrder}
               onChange={() => dispatch(setOrder(!isRandomOrder))}
             />
+<<<<<<< HEAD
             <span className="text-sm">Random Order</span>
           </label>
+=======
+            <span>Random Order</span>
+          </label>
+        </div>
+        <div className="flex items-center">
+>>>>>>> 7b1ef0ffc2cca39dacfd78b65693d4f01703db88
           <label className="flex items-center space-x-2">
             <input
               type="checkbox"
+              className="form-checkbox"
               checked={isFrontDisplayed}
               onChange={() => dispatch(setDisplayOrder(!isFrontDisplayed))}
             />
+<<<<<<< HEAD
             <span className="text-sm">Random Side</span>
           </label>
         </div>
@@ -95,6 +112,30 @@ const Deck = () => {
             </li>
           ))}
         </ul>
+=======
+            <span>Random Side</span>
+          </label>
+        </div>
+      </div>
+      <div className="space-y-4">
+        {languages.map((language) => (
+          <div key={language.id}>
+            <h2 className="text-xl font-semibold mb-2">{language.id}</h2>
+            <ul className="space-y-2">
+              {language.decks.map((deck) => (
+                <li key={deck.id}>
+                  <Link
+                    to={`/languages/${encodeURIComponent(language.id)}/decks/${encodeURIComponent(deck.name)}`}
+                    className="text-blue-500 hover:underline"
+                  >
+                    {deck.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+>>>>>>> 7b1ef0ffc2cca39dacfd78b65693d4f01703db88
       </div>
     </div>
   );

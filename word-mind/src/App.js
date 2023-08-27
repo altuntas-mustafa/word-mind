@@ -1,17 +1,19 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from '../src/redux/store';
-import Deck from './Components/JS/Deck';
-import Flashcards from './Components/JS/Flashcards';
 import './App.css';
+import Header from '../src/Components/JS/Header';
+import Deck from './Components/JS/Deck';
 import AddDeck from './Components/JS/AddDeck';
 import ChatGpt from './ExternalApi/ChatGpt';
+import Flashcards from './Components/JS/Flashcards';
 
 function App() {
   return (
     <Provider store={store}>
       <Router>
+<<<<<<< HEAD
     
           <nav className="bg-white dark:bg-gray-900 fixed w-full z-20 top-0 left-0 border-b border-gray-200 dark:border-gray-600 ">
           <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
@@ -39,10 +41,16 @@ function App() {
   </div>
   </div>
     <Routes>
+=======
+        <div className="container mx-auto mb-8 px-8">
+          <Header />
+          <Routes>
+>>>>>>> 7b1ef0ffc2cca39dacfd78b65693d4f01703db88
             <Route path="/" element={<Home />} />
             <Route path="/decks" element={<Deck />} />
             <Route path="/createdecks" element={<AddDeck />} />
             <Route path="/chatgpt" element={<ChatGpt />} />
+<<<<<<< HEAD
             <Route path="/languages/:language/decks/:deckName" element={<Flashcards />} /> {/* Update this route */}
             </Routes>
           </nav>
@@ -51,16 +59,25 @@ function App() {
       
     
            
+=======
+            <Route path="/languages/:language/decks/:deckName" element={<Flashcards />} />
+          </Routes>
+        </div>
+>>>>>>> 7b1ef0ffc2cca39dacfd78b65693d4f01703db88
       </Router>
     </Provider>
   );
 }
 
 function Home() {
-  
   return (
-    <div>
-     
+    <div className="mt-8 text-center">
+      <h1 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold">
+        Welcome To Word Mind App.
+      </h1>
+      <p className="mt-4 text-sm md:text-base lg:text-lg xl:text-xl">
+        Be ready to learn amazing words quickly :D
+      </p>
     </div>
   );
 }
