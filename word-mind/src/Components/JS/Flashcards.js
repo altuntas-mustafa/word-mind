@@ -92,12 +92,12 @@ const Flashcards = () => {
       </div>
     </div>
   ) : (
-    <div className="mb-3 font-normal text-gray-900 dark:text-gray-400 flex flex-col items-center justify-center h-[300px] w-[400px] overflow-hidden">
-      <p className="mb-1 font-normal text-gray-900 dark:text-gray-400 font-serif whitespace-pre-wrap">
+    <div className="mb-3 font-normal text-gray-900 dark:text-gray-700 flex flex-col items-center justify-center h-[300px] w-[400px] overflow-hidden">
+      <p className="mb-1 font-normal text-gray-900 dark:text-gray-700 font-serif whitespace-pre-wrap">
         {currentFlashcard.front}
       </p>
       <hr className="w-screen h-0.5 bg-black my-3 border-none" />
-      <p className="mb-1 font-normal text-gray-900 dark:text-gray-400 font-serif whitespace-pre-wrap">
+      <p className="mb-1 font-normal text-gray-900 dark:text-gray-700 font-serif whitespace-pre-wrap">
         {currentFlashcard.back}
       </p>
     </div>
