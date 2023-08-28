@@ -73,9 +73,9 @@ const Flashcards = () => {
   const isLastFlashcard = currentCardIndex === shuffledFlashcards.length - 1;
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <div className="w-full max-w-screen-md p-6 bg-white flex flex-col items-center text-3xl ">
-        <h2 className="font-serif text-xs mb-4 text-center">{deckName}</h2>
+    <div className="flex flex-col justify-center items-center min-h-screen">
+      <h2 className="font-serif text-xs mb-4 text-center justify-center">{deckName}</h2>
+      <div className="w-full mt-6 bg-white flex flex-col items-center text-3xl ">
         {!isFlipped && (
           <div className="mb-3 font-normal text-gray-700 dark:text-gray-400 flex flex-col items-center justify-center">
             <div className="mb-3 font-normal text-gray-700 dark:text-gray-400 items-center text-center ">
