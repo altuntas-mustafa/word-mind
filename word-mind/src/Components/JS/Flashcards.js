@@ -73,50 +73,53 @@ const Flashcards = () => {
   const isLastFlashcard = currentCardIndex === shuffledFlashcards.length - 1;
 
   return (
-    <div className="flex justify-center items-center ">
-      <div className="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700  ">
+    <div className="flex justify-center items-center">
+      <div className="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
         <h2>{deckName}</h2>
-        <div className="mb-3 font-normal text-gray-700 dark:text-gray-400">
-          <div className="mb-3 font-normal text-gray-700 dark:text-gray-400 items-center ">
-            {isFrontDisplayed && Math.random() < 0.5 ? (
-              <p>{currentFlashcard.back}</p>
-            ) : (
-              <p>{currentFlashcard.front}</p>
-            )}
-            <button
-              className="px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 "
-              onClick={handleFlip}
-            >
-              Flip
-            </button>
-          </div>
-
-          {isFlipped && (
-            <div className="mb-3 font-normal text-gray-700 dark:text-gray-400">
-              {currentFlashcard.front}
-              <hr className="line" />
-              <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
-                {currentFlashcard.back}
-              </p>
-              {isLastFlashcard && (
-                <Link to="/decks" className="viewDeck">
-                  Go to Decks
-                </Link>
+        {!isFlipped && (
+          <div className="mb-3 font-normal text-gray-700 dark:text-gray-400">
+            <div className="mb-3 font-normal text-gray-700 dark:text-gray-400 items-center">
+              {isFrontDisplayed && Math.random() < 0.5 ? (
+                <p>{currentFlashcard.back}</p>
+              ) : (
+                <p>{currentFlashcard.front}</p>
               )}
-              {!isLastFlashcard && (
-                <button
-                  className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                  onClick={handleNextCard}
-                >
-                  Next Card
-                </button>
-              )}
+              <button
+                className="px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                onClick={handleFlip}
+              >
+                Flip
+              </button>
             </div>
-          )}
-        </div>
+          </div>
+        )}
+  
+        {isFlipped && (
+          <div className="mb-3 font-normal text-gray-700 dark:text-gray-400">
+            {currentFlashcard.front}
+            <hr className="line" />
+            <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
+              {currentFlashcard.back}
+            </p>
+            {isLastFlashcard && (
+              <Link to="/decks" className="viewDeck">
+                Go to Decks
+              </Link>
+            )}
+            {!isLastFlashcard && (
+              <button
+                className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                onClick={handleNextCard}
+              >
+                Next Card
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
+  
 };
 
 export default Flashcards;
