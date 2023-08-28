@@ -30,10 +30,16 @@ function App() {
 
 function Home() {
   return (
-    <div className="mt-8 text-center text-3xl font-bold">
-      Welcome To Word Mind App. Be ready to learn amazing words quickly :D
+    <div className="mt-8 text-center">
+      <h1 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold">
+        Welcome To Word Mind App.
+      </h1>
+      <p className="mt-4 text-sm md:text-base lg:text-lg xl:text-xl">
+        Be ready to learn amazing words quickly :D
+      </p>
     </div>
   );
 }
+
 
 export default App;
