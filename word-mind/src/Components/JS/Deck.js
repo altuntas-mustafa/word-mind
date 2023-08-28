@@ -56,7 +56,37 @@ const Deck = () => {
     <div className="p-4 min-h-screen bg-black flex justify-center items-center ">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full md:w-3/4 lg:w-1/2  ">
         <h1 className="text-2xl font-bold mb-4 flex justify-center items-center">Language Page</h1>
-        
+        <div className="flex flex-col md:flex-row md:items-center md:justify-center md:space-x-2 mb-4">
+  <div className="flex items-center mb-2 md:mb-0">
+    <label className="flex items-center space-x-2 cursor-pointer">
+      <input
+        type="checkbox"
+        className="hidden toggle-checkbox"
+        checked={isRandomOrder}
+        onChange={() => dispatch(setOrder(!isRandomOrder))}
+      />
+      <div className={`relative w-10 h-6 bg-gray-300 rounded-full transition-colors ${isRandomOrder ? 'bg-green-400' : 'bg-gray-200'} `}>
+        <div className={`absolute left-1 transition-transform duration-300 ease-in-out h-1 w-4 pt-4 mt-1 bg-white rounded-full  ${isRandomOrder ? 'transform translate-x-full pt-4 mt-1' : ''}`}></div>
+      </div>
+      <span className="ml-2">Random Order</span>
+    </label>
+  </div>
+  <div className="flex items-center">
+    <label className="flex items-center space-x-2 cursor-pointer">
+      <input
+        type="checkbox"
+        className="hidden toggle-checkbox"
+        checked={isFrontDisplayed}
+        onChange={() => dispatch(setDisplayOrder(!isFrontDisplayed))}
+      />
+      <div className={`relative w-10 h-6 bg-gray-300 rounded-full transition-colors ${isFrontDisplayed ? 'bg-green-400' : 'bg-gray-200'}`}>
+        <div className={`absolute left-1 transition-transform duration-300 ease-in-out h-1 w-4 pt-4 mt-1 bg-white rounded-full ${isFrontDisplayed ? 'transform translate-x-full pt-4 mt-1' : ''}`}></div>
+      </div>
+      <span className="ml-2">Random Side</span>
+    </label>
+  </div>
+</div>
+
         <div className="space-y-4">
           {languages.map((language) => (
             <div key={language.id}>
