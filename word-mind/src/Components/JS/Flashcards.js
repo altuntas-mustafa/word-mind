@@ -73,32 +73,36 @@ const Flashcards = () => {
   const isLastFlashcard = currentCardIndex === shuffledFlashcards.length - 1;
 
   return (
-    <div className="flex justify-center items-center">
-      <div className="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-        <h2>{deckName}</h2>
+    <div className="flex justify-center items-center min-h-screen">
+      <div className="w-full max-w-screen-md p-6 bg-white flex flex-col items-center ">
+        <h2 className="font-serif text-xl">{deckName}</h2>
         {!isFlipped && (
-          <div className="mb-3 font-normal text-gray-700 dark:text-gray-400">
-            <div className="mb-3 font-normal text-gray-700 dark:text-gray-400 items-center">
+          <div className="mb-3 font-normal text-gray-700 dark:text-gray-400 flex flex-col items-center justify-center">
+            <div className="mb-3 font-normal text-gray-700 dark:text-gray-400 items-center text-center">
               {isFrontDisplayed && Math.random() < 0.5 ? (
-                <p>{currentFlashcard.back}</p>
+                <p>{currentFlashcard.back} </p>
               ) : (
-                <p>{currentFlashcard.front}</p>
+                <p> {currentFlashcard.front}</p>
               )}
               <button
-                className="px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                className="px-3 py-2 mt-3 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 onClick={handleFlip}
               >
                 Flip
               </button>
             </div>
           </div>
+          
         )}
-  
+
         {isFlipped && (
-          <div className="mb-3 font-normal text-gray-700 dark:text-gray-400">
-            {currentFlashcard.front}
-            <hr className="line" />
-            <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
+          <div className="mb-3 font-normal text-gray-700 dark:text-gray-400 flex flex-col items-center justify-center">
+             <p className="mb-1 font-normal text-gray-700 dark:text-gray-400 font-serif">
+              {currentFlashcard.front}
+            </p>
+            <hr className="w-full h-0.5 bg-black my-3" />
+            
+            <p className="mb-1 font-normal text-gray-700 dark:text-gray-400 font-serif">
               {currentFlashcard.back}
             </p>
             {isLastFlashcard && (
@@ -108,7 +112,7 @@ const Flashcards = () => {
             )}
             {!isLastFlashcard && (
               <button
-                className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                className="mt-3 inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 onClick={handleNextCard}
               >
                 Next Card
@@ -119,7 +123,6 @@ const Flashcards = () => {
       </div>
     </div>
   );
-  
 };
 
 export default Flashcards;

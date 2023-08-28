@@ -19,7 +19,7 @@ function App() {
   return (
     <Provider store={store}>
       <Router>
-        <div className="w-screen bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 border-b border-gray-400 ">
+        <div className="w-screen border-b border-gray-400 ">
           <Header />
           <Routes>
             <Route path="/" element={<Home />} />
