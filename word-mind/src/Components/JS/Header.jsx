@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../firebase/firebase";
 
@@ -71,21 +70,21 @@ export default function Header() {
                   {/* Conditionally show login or logout link */}
                   {isLoggedIn ? (
                     <li>
-                      <Link
-                        to="/logout"
+                      <a
+                        href="/logout"
                         className="text-lg text-gray-700 hover:text-yellow-300"
                       >
                         Logout
-                      </Link>
+                      </a>
                     </li>
                   ) : (
                     <li>
-                      <Link
-                        to="/login"
+                      <a
+                        href="/login"
                         className="text-lg text-gray-700 hover:text-yellow-300"
                       >
                         Login
-                      </Link>
+                      </a>
                     </li>
                   )}
                 </ul>
@@ -123,21 +122,21 @@ export default function Header() {
             {/* Conditionally show login or logout link */}
             {isLoggedIn ? (
               <li>
-                <Link
-                  to="/logout"
+                <a
+                  href="/logout"
                   className="text-xl text-white hover:text-yellow-300"
                 >
                   Logout
-                </Link>
+                </a>
               </li>
             ) : (
               <li>
-                <Link
-                  to="/login"
+                <a
+                  href="/login"
                   className="text-xl text-white hover:text-yellow-300"
                 >
                   Login
-                </Link>
+                </a>
               </li>
             )}
           </ul>

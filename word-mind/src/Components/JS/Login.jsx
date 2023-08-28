@@ -1,7 +1,7 @@
 import React from 'react';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../../firebase/firebase';
-import { Link, useNavigate } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -18,23 +18,18 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-start justify-center min-h-screen bg-black">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full md:w-3/4 lg:w-1/2 mt-8">
-        <h2 className="text-2xl font-semibold mb-4">Login</h2>
-        <button
-          onClick={handleGoogleLogin}
-          className="bg-red-600 text-white px-4 py-2 rounded"
-        >
-          Log In with Google
-        </button>
-        {/* <p className="mt-4">
-          Don't have an account?{' '}
-          <Link to="/register" className="text-blue-500">
-            Sign up
-          </Link>
-        </p> */}
-      </div>
+    <div className="flex items-start justify-center min-h-screen bg-black p-4">
+    <div className="bg-white p-8 rounded-lg shadow-lg w-full md:w-11/12 lg:w-3/4 xl:w-1/2 mt-8">
+      <h2 className="text-2xl font-semibold mb-4">Login</h2>
+      <button
+        onClick={handleGoogleLogin}
+        className="bg-red-600 text-white px-4 py-2 rounded"
+      >
+        Log In with Google
+      </button>
     </div>
+  </div>
+  
   );
 };
 
