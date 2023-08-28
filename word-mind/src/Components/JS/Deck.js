@@ -53,17 +53,10 @@ const Deck = () => {
   }, []);
 
   return (
-<<<<<<< HEAD
-    <div className="deck-container bg-gray-100 p-4 flex flex-col items-center mt-12">
-      <h1 className="deck-title text-3xl font-bold mb-4">Language Page</h1>
-      <div className="options mb-4">
-        <div className="toggle-container">
-=======
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Language Page</h1>
       <div className="flex space-x-4 mb-4">
         <div className="flex items-center">
->>>>>>> 7b1ef0ffc2cca39dacfd78b65693d4f01703db88
           <label className="flex items-center space-x-2">
             <input
               type="checkbox"
@@ -71,15 +64,10 @@ const Deck = () => {
               checked={isRandomOrder}
               onChange={() => dispatch(setOrder(!isRandomOrder))}
             />
-<<<<<<< HEAD
-            <span className="text-sm">Random Order</span>
-          </label>
-=======
             <span>Random Order</span>
           </label>
         </div>
         <div className="flex items-center">
->>>>>>> 7b1ef0ffc2cca39dacfd78b65693d4f01703db88
           <label className="flex items-center space-x-2">
             <input
               type="checkbox"
@@ -87,32 +75,6 @@ const Deck = () => {
               checked={isFrontDisplayed}
               onChange={() => dispatch(setDisplayOrder(!isFrontDisplayed))}
             />
-<<<<<<< HEAD
-            <span className="text-sm">Random Side</span>
-          </label>
-        </div>
-      </div>
-      <div className="language-list-container">
-        <ul className="language-list">
-          {languages.map((language) => (
-            <li key={language.id} className="language-item mb-4">
-              <h2 className="language-name text-lg font-semibold">{language.id}</h2>
-              <ul className="deck-list">
-                {language.decks.map((deck) => (
-                  <li key={deck.id} className="deck-item">
-                    <Link
-                      to={`/languages/${encodeURIComponent(language.id)}/decks/${encodeURIComponent(deck.name)}`}
-                      className="deck-link text-blue-500 hover:underline"
-                    >
-                      {deck.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ul>
-=======
             <span>Random Side</span>
           </label>
         </div>
@@ -135,7 +97,6 @@ const Deck = () => {
             </ul>
           </div>
         ))}
->>>>>>> 7b1ef0ffc2cca39dacfd78b65693d4f01703db88
       </div>
     </div>
   );
