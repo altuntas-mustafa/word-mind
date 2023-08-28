@@ -74,11 +74,11 @@ const Flashcards = () => {
 
   return (
     <div className="flex justify-center items-center min-h-screen">
-      <div className="w-full max-w-screen-md p-6 bg-white flex flex-col items-center ">
-        <h2 className="font-serif text-xl mb-4">{deckName}</h2>
+      <div className="w-full max-w-screen-md p-6 bg-white flex flex-col items-center text-2xl ">
+        <h2 className="font-serif text-3xl mb-4">{deckName}</h2>
         {!isFlipped && (
           <div className="mb-3 font-normal text-gray-700 dark:text-gray-400 flex flex-col items-center justify-center">
-            <div className="mb-3 font-normal text-gray-700 dark:text-gray-400 items-center text-center">
+            <div className="mb-3 font-normal text-gray-700 dark:text-gray-400 items-center text-center ">
               {isFrontDisplayed && Math.random() < 0.5 ? (
                 <p>{currentFlashcard.back} </p>
               ) : (
