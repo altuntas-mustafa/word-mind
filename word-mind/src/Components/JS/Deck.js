@@ -54,29 +54,36 @@ const Deck = () => {
 
   return (
     <div className="p-4 flex items-center justify-center min-h-screen bg-black">
-      <div className="bg-white p-8 rounded-lg shadow-lg">
+     <div className="bg-white p-8 rounded-lg shadow-lg">
         <h1 className="text-2xl font-bold mb-4">Language Page</h1>
         <div className="flex space-x-4 mb-4">
           <div className="flex items-center">
             <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                className="form-checkbox"
+                className="hidden toggle-checkbox"
                 checked={isRandomOrder}
                 onChange={() => dispatch(setOrder(!isRandomOrder))}
               />
-              <span>Random Order</span>
+              <div className={`relative w-10 h-6 bg-gray-300 rounded-full transition-colors ${isRandomOrder ? 'bg-green-400' : 'bg-white'} `}>
+              <div className={`absolute left-1 transition-transform duration-300 ease-in-out h-1 w-4 pt-4 mt-1 bg-white rounded-full  ${isRandomOrder ? 'transform translate-x-full pt-4 mt-1' : ''}`}></div>
+
+              </div>
+              <span className="ml-2">Random Order</span>
             </label>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center ml-4">
             <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                className="form-checkbox"
+                className="hidden toggle-checkbox"
                 checked={isFrontDisplayed}
                 onChange={() => dispatch(setDisplayOrder(!isFrontDisplayed))}
               />
-              <span>Random Side</span>
+              <div className={`relative w-10 h-6 bg-gray-300 rounded-full transition-colors ${isFrontDisplayed ? 'bg-green-400' : 'bg-white'}`}>
+                <div className={`absolute left-1 transition-transform duration-300 ease-in-out h-1 w-4 pt-4 mt-1 bg-white rounded-full ${isFrontDisplayed ? 'transform translate-x-full pt-4 mt-1' : ''}`}></div>
+              </div>
+              <span className="ml-2">Random Side</span>
             </label>
           </div>
         </div>

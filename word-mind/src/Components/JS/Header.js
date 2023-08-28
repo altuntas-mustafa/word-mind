@@ -4,9 +4,9 @@ export default function Header() {
   const [isNavOpen, setIsNavOpen] = useState(false);
 
   return (
-    <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 border-b border-gray-400 py-8 ">
+    <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 border-b border-gray-400 py-8">
       <div className="container mx-auto flex items-center justify-between">
-        <a href="/" className="text-2xl font-semibold whitespace-nowrap text-white hover:text-yellow-300">
+        <a href="/" className="text-3xl font-semibold whitespace-nowrap text-white hover:text-yellow-300">
           Word-Mind
         </a>
         <nav>
@@ -40,13 +40,13 @@ export default function Header() {
               </div>
               <ul className="flex flex-col items-center justify-between min-h-[250px] bg-white backdrop-blur-md rounded-lg p-6 space-y-4">
                 <li>
-                  <a href="/" className="text-gray-700 hover:text-yellow-300">Home</a>
+                  <a href="/" className="text-lg text-gray-700 hover:text-yellow-300">Home</a>
                 </li>
                 <li>
-                  <a href="/decks" className="text-gray-700 hover:text-yellow-300">Decks</a>
+                  <a href="/decks" className="text-lg text-gray-700 hover:text-yellow-300">Decks</a>
                 </li>
                 <li>
-                  <a href="/createdecks" className="text-gray-700 hover:text-yellow-300">Create Deck</a>
+                  <a href="/createdecks" className="text-lg text-gray-700 hover:text-yellow-300">Create Deck</a>
                 </li>
               </ul>
             </div>
@@ -54,13 +54,13 @@ export default function Header() {
 
           <ul className="DESKTOP-MENU hidden space-x-8 lg:flex">
             <li>
-              <a href="/" className="text-white hover:text-yellow-300">Home</a>
+              <a href="/" className="text-xl text-white hover:text-yellow-300">Home</a>
             </li>
             <li>
-              <a href="/decks" className="text-white hover:text-yellow-300">Decks</a>
+              <a href="/decks" className="text-xl text-white hover:text-yellow-300">Decks</a>
             </li>
             <li>
-              <a href="/createdecks" className="text-white hover:text-yellow-300">Create Deck</a>
+              <a href="/createdecks" className="text-xl text-white hover:text-yellow-300">Create Deck</a>
             </li>
           </ul>
         </nav>
