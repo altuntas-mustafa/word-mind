@@ -4,15 +4,14 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from '../src/redux/store';
 import './App.css';
-import Header from '../src/Components/JS/Header';
-import Deck from './Components/JS/Deck';
-import AddDeck from './Components/JS/AddDeck';
-import ChatGpt from './ExternalApi/ChatGpt';
-import Flashcards from './Components/JS/Flashcards';
-import Home from './Components/JS/Home';
-import Login from './Components/JS/Login';
-import DashBoard from './Components/JS/Dashboard';
-import Logout from './Components/JS/Logout';
+import MainPage from './Components/MainPage';
+import DashBoard from './Components/Dashboard';
+import Login from './Components/Login';
+import Logout from './Components/Logout';
+import Header from './Components/Header';
+
+import AddDeck from './JS/AddDeck';
+import Flashcards from './JS/Flashcards';
 
 
 function App() {
@@ -22,10 +21,8 @@ function App() {
         <div className="w-screen border-b border-gray-400 ">
           <Header />
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/decks" element={<Deck />} />
+            <Route path="/" element={<MainPage />} />
             <Route path="/createdecks" element={<AddDeck />} />
-            <Route path="/chatgpt" element={<ChatGpt />} />
             <Route path="/dashboard" element={<DashBoard />} />
             <Route path="/login" element={<Login />} />
             <Route path="/logout" element={<Logout />} />

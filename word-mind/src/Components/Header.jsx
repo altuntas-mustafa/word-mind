@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../firebase/firebase";
+import { auth } from "../firebase/firebase";
 
 export default function Header() {
   const [isNavOpen, setIsNavOpen] = useState(false);
@@ -59,9 +59,6 @@ export default function Header() {
                     <a href="/" className="text-lg text-gray-700 hover:text-yellow-300">Home</a>
                   </li>
                   <li>
-                    <a href="/decks" className="text-lg text-gray-700 hover:text-yellow-300">Decks</a>
-                  </li>
-                  <li>
                     <a href="/createdecks" className="text-lg text-gray-700 hover:text-yellow-300">Create Deck</a>
                   </li>
                   <li>
@@ -96,11 +93,6 @@ export default function Header() {
             <li>
               <a href="/" className="text-xl text-white hover:text-yellow-300">
                 Home
-              </a>
-            </li>
-            <li>
-              <a href="/decks" className="text-xl text-white hover:text-yellow-300">
-                Decks
               </a>
             </li>
             <li>

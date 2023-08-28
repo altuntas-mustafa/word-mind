@@ -1,6 +1,6 @@
 import React from 'react';
 import { GoogleAuthProvider, signInWithPopup, getAuth, onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../../firebase/firebase';
+import { auth } from '../firebase/firebase';
 import { Link } from 'react-router-dom';
 
 const DashBoard = () => {
