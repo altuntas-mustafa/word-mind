@@ -10,6 +10,9 @@ import AddDeck from './Components/JS/AddDeck';
 import ChatGpt from './ExternalApi/ChatGpt';
 import Flashcards from './Components/JS/Flashcards';
 import Home from './Components/JS/Home';
+import Login from './Components/JS/Login';
+import DashBoard from './Components/JS/Dashboard';
+import Logout from './Components/JS/Logout';
 
 
 function App() {
@@ -23,6 +26,9 @@ function App() {
             <Route path="/decks" element={<Deck />} />
             <Route path="/createdecks" element={<AddDeck />} />
             <Route path="/chatgpt" element={<ChatGpt />} />
+            <Route path="/dashboard" element={<DashBoard />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/logout" element={<Logout />} />
             <Route path="/languages/:language/decks/:deckName" element={<Flashcards />} />
           </Routes>
         </div>
