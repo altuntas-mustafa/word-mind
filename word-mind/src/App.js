@@ -35,7 +35,7 @@ function Home() {
         Welcome To Word Mind App.
       </h1>
       <p className="mt-4 text-sm md:text-base lg:text-lg xl:text-xl">
-        Be ready to learn amazing words quickly :D
+        Be ready to learn amazing words quickly ::D
       </p>
     </div>
   );
