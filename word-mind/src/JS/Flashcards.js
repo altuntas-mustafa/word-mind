@@ -78,9 +78,9 @@ const Flashcards = () => {
         {deckName}
       </h2>
       
-      <div className="w-full mt-20 bg-white flex flex-col items-center text-3xl">
+      <div className="w-full mt-20 bg-white flex flex-col items-center text-3xl mt-40">
   {!isFlipped ? (
-    <div className="mb-3 font-normal text-gray-900 dark:text-gray-700 flex flex-col items-center justify-center h-[300px] w-[400px] overflow-hidden">
+    <div className="mb-3 font-normal text-gray-900 dark:text-gray-700 flex flex-col items-center justify-center  overflow-hidden ">
       <div className="mb-3 font-normal text-gray-900 dark:text-gray-700 items-center text-center overflow-hidden flex-grow">
         <div className="flex items-center justify-center h-full">
           {isFrontDisplayed && Math.random() < 0.5 ? (
@@ -92,7 +92,7 @@ const Flashcards = () => {
       </div>
     </div>
   ) : (
-    <div className="mb-3 font-normal text-gray-900 dark:text-gray-700 flex flex-col items-center justify-center h-[300px] w-[400px] overflow-hidden">
+    <div className="mb-3 font-normal text-gray-900 dark:text-gray-700 flex flex-col items-center justify-center  overflow-hidden">
       <p className="mb-1 font-normal text-gray-900 dark:text-gray-700 font-serif whitespace-pre-wrap">
         {currentFlashcard.front}
       </p>
