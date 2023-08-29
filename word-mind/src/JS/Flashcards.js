@@ -105,30 +105,31 @@ const Flashcards = () => {
 </div>
 
 
-      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex space-x-4 mt-4">
-        {!isFlipped ? (
-          <button
-            className="px-3 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-24"
-            onClick={handleFlip}
-          >
-            Flip
-          </button>
-        ) : isLastFlashcard ? (
-          <Link
-            to="/"
-            className="mt-3 inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-24"
-          >
-            Go to Decks
-          </Link>
-        ) : (
-          <button
-            className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-24"
-            onClick={handleNextCard}
-          >
-            Next Card
-          </button>
-        )}
-      </div>
+<div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex space-x-4 mt-4">
+  {!isFlipped ? (
+    <button
+      className="px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-35"
+      onClick={handleFlip}
+    >
+      Flip
+    </button>
+  ) : isLastFlashcard ? (
+    <Link
+      to="/"
+      className="mt-3 inline-flex items-center px-4 py-2 text-sm font-small text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-35"
+    >
+      Go to Decks
+    </Link>
+  ) : (
+    <button
+      className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-35"
+      onClick={handleNextCard}
+    >
+      Next Card
+    </button>
+  )}
+</div>
+
     </div>
   );
 };
