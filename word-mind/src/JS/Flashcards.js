@@ -77,10 +77,20 @@ const Flashcards = () => {
       <h2 className="font-serif text-x mb-4 text-center justify-center">
         {deckName}
       </h2>
-      
+
       <div className="w-full mt-20 bg-white flex flex-col items-center text-3xl mt-40">
-  {!isFlipped ? (
-    <div className="mb-3 font-normal text-gray-900 dark:text-gray-700 flex flex-col items-center justify-center  overflow-hidden ">
+  {isFlipped ? (
+    <div className="mb-3 font-normal text-gray-900 dark:text-gray-700 flex flex-col items-center justify-center  overflow-hidden">
+      <p className="mb-1 font-normal text-gray-900 dark:text-gray-700 font-serif whitespace-pre-wrap">
+        {currentFlashcard.front}
+      </p>
+      <hr className="w-screen h-0.5 bg-black my-3 border-none" />
+      <p className="mb-1 font-normal text-gray-900 dark:text-gray-700 font-serif whitespace-pre-wrap">
+        {currentFlashcard.back}
+      </p>
+    </div>
+  ) : (
+    <div className="mb-3 font-normal text-gray-900 dark:text-gray-700 flex flex-col items-center justify-center  overflow-hidden">
       <div className="mb-3 font-normal text-gray-900 dark:text-gray-700 items-center text-center overflow-hidden flex-grow">
         <div className="flex items-center justify-center h-full">
           {isFrontDisplayed && Math.random() < 0.5 ? (
@@ -91,45 +101,34 @@ const Flashcards = () => {
         </div>
       </div>
     </div>
-  ) : (
-    <div className="mb-3 font-normal text-gray-900 dark:text-gray-700 flex flex-col items-center justify-center  overflow-hidden">
-      <p className="mb-1 font-normal text-gray-900 dark:text-gray-700 font-serif whitespace-pre-wrap">
-        {currentFlashcard.front}
-      </p>
-      <hr className="w-screen h-0.5 bg-black my-3 border-none" />
-      <p className="mb-1 font-normal text-gray-900 dark:text-gray-700 font-serif whitespace-pre-wrap">
-        {currentFlashcard.back}
-      </p>
-    </div>
   )}
 </div>
 
 
-<div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex space-x-4 mt-4">
-  {!isFlipped ? (
-    <button
-      className="px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-35"
-      onClick={handleFlip}
-    >
-      Flip
-    </button>
-  ) : isLastFlashcard ? (
-    <Link
-      to="/"
-      className="mt-3 inline-flex items-center px-4 py-2 text-sm font-small text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-35"
-    >
-      Go to Decks
-    </Link>
-  ) : (
-    <button
-      className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-35"
-      onClick={handleNextCard}
-    >
-      Next Card
-    </button>
-  )}
-</div>
-
+      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex space-x-4 mt-4">
+        {!isFlipped ? (
+          <button
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-35"
+            onClick={handleFlip}
+          >
+            Flip
+          </button>
+        ) : isLastFlashcard ? (
+          <Link
+            to="/"
+            className="mt-3 inline-flex items-center px-4 py-2 text-sm font-small text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-35"
+          >
+            Go to Decks
+          </Link>
+        ) : (
+          <button
+            className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-35"
+            onClick={handleNextCard}
+          >
+            Next Card
+          </button>
+        )}
+      </div>
     </div>
   );
 };
