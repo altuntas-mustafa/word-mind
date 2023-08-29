@@ -85,7 +85,7 @@ const AddDeck = () => {
     }
 
     try {
-      const deckDocRef = doc(
+      const deckDocRef = doc( 
         db,
         "languages",
         deckInfo.language,
