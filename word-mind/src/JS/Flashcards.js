@@ -79,31 +79,32 @@ const Flashcards = () => {
       </h2>
 
       <div className="w-full mt-20 bg-white flex flex-col items-center text-3xl mt-40">
-  {isFlipped ? (
-    <div className="mb-3 font-normal text-gray-900 dark:text-gray-700 flex flex-col items-center justify-center  overflow-hidden">
-      <p className="mb-1 font-normal text-gray-900 dark:text-gray-700 font-serif whitespace-pre-wrap">
-        {currentFlashcard.front}
-      </p>
-      <hr className="w-screen h-0.5 bg-black my-3 border-none" />
-      <p className="mb-1 font-normal text-gray-900 dark:text-gray-700 font-serif whitespace-pre-wrap">
-        {currentFlashcard.back}
-      </p>
-    </div>
-  ) : (
-    <div className="mb-3 font-normal text-gray-900 dark:text-gray-700 flex flex-col items-center justify-center  overflow-hidden">
-      <div className="mb-3 font-normal text-gray-900 dark:text-gray-700 items-center text-center overflow-hidden flex-grow">
-        <div className="flex items-center justify-center h-full">
-          {isFrontDisplayed && Math.random() < 0.5 ? (
-            <p className="whitespace-pre-wrap">{currentFlashcard.back}</p>
-          ) : (
-            <p className="whitespace-pre-wrap">{currentFlashcard.front}</p>
-          )}
-        </div>
+        {isFlipped ? (
+          <div className="mb-3 font-normal text-gray-900 dark:text-gray-700 flex flex-col items-center justify-center  overflow-hidden">
+            <p className="mb-1 font-normal text-gray-900 dark:text-gray-700 font-serif whitespace-pre-wrap">
+              {currentFlashcard.front}
+            </p>
+            <hr className="w-screen h-0.5 bg-black my-3 border-none" />
+            <p className="mb-1 font-normal text-gray-900 dark:text-gray-700 font-serif whitespace-pre-wrap">
+              {currentFlashcard.back}
+            </p>
+          </div>
+        ) : (
+          <div className="mb-3 font-normal text-gray-900 dark:text-gray-700 flex flex-col items-center justify-center  overflow-hidden">
+            <div className="mb-3 font-normal text-gray-900 dark:text-gray-700 items-center text-center overflow-hidden flex-grow">
+              <div className="flex items-center justify-center h-full">
+                {isFrontDisplayed && Math.random() < 0.5 ? (
+                  <p className="whitespace-pre-wrap">{currentFlashcard.back}</p>
+                ) : (
+                  <p className="whitespace-pre-wrap">
+                    {currentFlashcard.front}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-    </div>
-  )}
-</div>
-
 
       <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex space-x-4 mt-4">
         {!isFlipped ? (

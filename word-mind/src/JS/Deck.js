@@ -3,7 +3,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setOrder, setDisplayOrder } from "../redux/reducers";
+import { setOrder, setDisplayOrder } from "../redux/reducers/reducers";
 
 const Deck = () => {
   const [languages, setLanguages] = useState([]);

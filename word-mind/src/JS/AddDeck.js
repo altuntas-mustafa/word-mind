@@ -118,6 +118,7 @@ const AddDeck = () => {
           { front: "", back: "" },
           { front: "", back: "" },
         ],
+
       });
     } catch (error) {
       console.error("Error creating deck:", error);

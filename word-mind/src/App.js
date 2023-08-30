@@ -1,7 +1,7 @@
 // App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Provider } from 'react-redux';
+import { Provider, useDispatch, useSelector } from 'react-redux';
 import store from '../src/redux/store';
 import './App.css';
 import MainPage from './Components/MainPage';
@@ -10,11 +10,13 @@ import Login from './Components/Login';
 import Logout from './Components/Logout';
 import Header from './Components/Header';
 
+
 import AddDeck from './JS/AddDeck';
 import Flashcards from './JS/Flashcards';
 
 
 function App() {
+
   return (
     <Provider store={store}>
       <Router>
