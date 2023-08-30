@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser } from '../redux/reducers/user';
 import {
   collection,
   addDoc,
@@ -11,8 +13,13 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import Popup from "./Popup";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const AddDeck = () => {
+  const firebaseAuth = getAuth();
+  const user = useSelector((state) => state.user); // Access user info from Redux store
+  const dispatch = useDispatch(); // Get the dispatch function from Redux
+  const [isLoading, setIsLoading] = React.useState(true); // State to track loading status
   const [isSuccessPopupVisible, setIsSuccessPopupVisible] = useState(false);
   const [isErrorPopupVisible, setIsErrorPopupVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -27,6 +34,27 @@ const AddDeck = () => {
 
   const [selectedOption, setSelectedOption] = useState("manual");
   const [uploadedFile, setUploadedFile] = useState(null);
+
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
+      if (user) {
+        // If user is logged in, dispatch the setUser action to update the store
+        dispatch(setUser({
+          id: user.uid,
+          displayName: user.displayName,
+          email: user.email,
+        }));
+      }
+      setIsLoading(false); // Mark loading as complete
+    });
+
+    return () => {
+      unsubscribe(); // Cleanup the auth state listener
+    };
+  }, [dispatch, firebaseAuth]); 
+
+
 
   const handleCardChange = (index, field, value) => {
     const newCards = [...deckInfo.cards];
@@ -96,9 +124,12 @@ const AddDeck = () => {
       }
   
       // If the language and deck are valid, create the deck
+      console.log(user.id);
       const deckDocRef = doc(languageDocRef, "decks", deckInfo.deckName);
       await setDoc(deckDocRef, {
         name: deckInfo.deckName,
+        creatorUser: user.id,
+        accessUser: [{"userId":user.id}],
       });
   
       const flashcardsCollectionRef = collection(deckDocRef, "flashcards");

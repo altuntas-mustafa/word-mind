@@ -7,6 +7,7 @@ import Login from './Login';
 const DashBoard = () => {
   const firebaseAuth = getAuth();
   const user = useSelector(state => state.user); // Access user info from Redux store
+  console.log(user);
   const dispatch = useDispatch(); // Get the dispatch function from Redux
   const [isLoading, setIsLoading] = React.useState(true); // State to track loading status
 
