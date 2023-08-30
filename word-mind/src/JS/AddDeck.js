@@ -24,14 +24,16 @@ const AddDeck = () => {
   const [selectedOption, setSelectedOption] = useState('manual');
   const [uploadedFile, setUploadedFile] = useState(null);
 
+
   useEffect(() => {
-    const unsubscribe = UserInfo(dispatch); // Call the fetchUserInfo function
-
-    return () => {
-      unsubscribe(); // Cleanup the auth state listener
-    };
+    // Define an async function
+    async function fetchUserInfoAsync() {
+      await UserInfo(dispatch); // Await the UserInfo function
+    }
+  
+    // Call the async function
+    fetchUserInfoAsync();
   }, [dispatch]);
-
 
   const handleCardChange = (index, field, value) => {
     const newCards = [...deckInfo.cards];
