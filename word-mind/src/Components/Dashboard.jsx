@@ -5,7 +5,6 @@ import { UserInfo } from '../JS/UserInfo';
 
 const DashBoard = () => {
   const user = useSelector(state => state.user); // Access user info from Redux store
-  console.log(user);
   const dispatch = useDispatch(); // Get the dispatch function from Redux
   const [isLoading, setIsLoading] = React.useState(true); // State to track loading status
 

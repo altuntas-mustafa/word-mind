@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../firebase/firebase";
+import { collection, getDocs, doc, updateDoc, getDoc } from "firebase/firestore";
+import { auth, db } from "../firebase/firebase";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setOrder, setDisplayOrder } from "../redux/reducers/reducers";
+
 
 const Deck = () => {
   const [languages, setLanguages] = useState([]);
@@ -38,8 +39,16 @@ const Deck = () => {
         for (const deckDoc of decksQuerySnapshot.docs) {
           const deckId = deckDoc.id;
           const deckData = deckDoc.data();
+          // Check if the current user has liked the deck
+          const isLikedByUser =
+            Array.isArray(deckData.accessUser) &&
+            deckData.accessUser.some((user) => {
+              return user.userId === user.userId;
+            });
+
           languageData.decks.push({
             id: deckId,
+            isLikedByUser: isLikedByUser,
             ...deckData,
           });
         }
@@ -50,6 +59,37 @@ const Deck = () => {
       setLanguages(languagesData);
     } catch (error) {
       console.error("Error fetching languages and decks:", error);
+    }
+  }
+
+  async function handleLike(deckId) {
+    try {
+      const deckRef = doc(db, "decks", deckId);
+      const deckSnapshot = await getDoc(deckRef);
+      const deckData = deckSnapshot.data();
+
+      const currentUser = auth.currentUser; // Assuming you have auth setup
+      const isLikedByUser = deckData.accessUser.some(
+        (user) => user.userId === currentUser.uid
+      );
+
+      let updatedAccessUser;
+      if (isLikedByUser) {
+        updatedAccessUser = deckData.accessUser.filter(
+          (user) => user.userId !== currentUser.uid
+        );
+      } else {
+        updatedAccessUser = [
+          ...deckData.accessUser,
+          { userId: currentUser.uid },
+        ];
+      }
+
+      await updateDoc(deckRef, { accessUser: updatedAccessUser });
+
+      fetchLanguagesAndDecksFromFirebase();
+    } catch (error) {
+      console.error("Error handling like:", error);
     }
   }
 
@@ -115,30 +155,29 @@ const Deck = () => {
         <div className="space-y-4 ml-10  ">
           {languages.map((language) => (
             <div key={language.id}>
-              <h2 className="text-4xl font-semibold mb-2">{language.id}</h2>
-              <ul className="space-y-2 ml-10">
-                {language.decks.map((deck) => (
-                  <li key={deck.id}>
-                    <Link
-                      to={`/languages/${encodeURIComponent(
-                        language.id
-                      )}/decks/${encodeURIComponent(deck.name)}`}
-                      className="text-blue-500 hover:underline block transition duration-300 ease-in-out transform hover:scale-105 text-2xl"
-                    >
-                      {deck.name}
-                    </Link>
-                    {/* <button
-                  // onClick={() => handleLike(deck.id)}
-                  className={`ml-2 text-gray-500 hover:text-blue-500 ${
-                    deck.isLikedByUser ? "text-blue-500" : ""
-                  }`}
-                >
-                  {deck.isLikedByUser ? "Liked" : "Like"}
-                </button> */}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <h2 className="text-4xl font-semibold mb-2">{language.id}</h2>
+            <ul className="space-y-2 ml-10">
+              {language.decks.map((deck) => (
+                <li key={deck.id} className="flex items-center">
+                  <Link
+                    to={`/languages/${encodeURIComponent(language.id)}/decks/${encodeURIComponent(deck.name)}`}
+                    className="text-blue-500 hover:underline block transition duration-300 ease-in-out transform hover:scale-105 text-2xl"
+                  >
+                    {deck.name}
+                  </Link>
+                  <button
+                    onClick={() => handleLike(deck.id)}
+                    className={`ml-2 px-3 py-1 rounded text-white ${
+                      deck.isLikedByUser ? "bg-red-500" : "bg-gray-500"
+                    }`}
+                  >
+                    {deck.isLikedByUser ? "Liked" : "Like"}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+          
           ))}
         </div>
       </div>
