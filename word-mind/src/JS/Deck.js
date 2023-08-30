@@ -127,6 +127,14 @@ const Deck = () => {
                     >
                       {deck.name}
                     </Link>
+                    {/* <button
+                  // onClick={() => handleLike(deck.id)}
+                  className={`ml-2 text-gray-500 hover:text-blue-500 ${
+                    deck.isLikedByUser ? "text-blue-500" : ""
+                  }`}
+                >
+                  {deck.isLikedByUser ? "Liked" : "Like"}
+                </button> */}
                   </li>
                 ))}
               </ul>

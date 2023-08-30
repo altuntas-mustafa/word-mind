@@ -1,59 +1,36 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setUser } from '../redux/reducers/user';
-import {
-  collection,
-  addDoc,
-  doc,
-  setDoc,
-  getDocs,
-  query,
-  where,
-  getDoc,
-} from "firebase/firestore";
-import { db } from "../firebase/firebase";
-import Popup from "./Popup";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+// import { setUser } from '../redux/reducers/user';
+import Popup from './Popup';
+import { handleSubmit } from './createDeckAndLanguage';
+import { UserInfo } from './UserInfo'; // Import the user utility function
 
 const AddDeck = () => {
-  const firebaseAuth = getAuth();
-  const user = useSelector((state) => state.user); // Access user info from Redux store
   const dispatch = useDispatch(); // Get the dispatch function from Redux
-  const [isLoading, setIsLoading] = React.useState(true); // State to track loading status
+  const user = useSelector((state) => state.user); // Access user info from Redux store
+
   const [isSuccessPopupVisible, setIsSuccessPopupVisible] = useState(false);
   const [isErrorPopupVisible, setIsErrorPopupVisible] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState('');
   const [deckInfo, setDeckInfo] = useState({
-    deckName: "",
-    language: "",
+    deckName: '',
+    language: '',
     cards: [
-      { front: "", back: "" },
-      { front: "", back: "" },
+      { front: '', back: '' },
+      { front: '', back: '' },
     ],
   });
 
-  const [selectedOption, setSelectedOption] = useState("manual");
+  const [selectedOption, setSelectedOption] = useState('manual');
   const [uploadedFile, setUploadedFile] = useState(null);
 
-
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
-      if (user) {
-        // If user is logged in, dispatch the setUser action to update the store
-        dispatch(setUser({
-          id: user.uid,
-          displayName: user.displayName,
-          email: user.email,
-        }));
-      }
-      setIsLoading(false); // Mark loading as complete
-    });
+    const unsubscribe = UserInfo(dispatch); // Call the fetchUserInfo function
 
     return () => {
       unsubscribe(); // Cleanup the auth state listener
     };
-  }, [dispatch, firebaseAuth]); 
-
+  }, [dispatch]);
 
 
   const handleCardChange = (index, field, value) => {
@@ -80,80 +57,16 @@ const AddDeck = () => {
     reader.readAsText(file);
   };
 
-  const handleSubmit = async (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-  
-    if (!deckInfo.deckName || !deckInfo.language) {
-      setErrorMessage("Please fill out the deck name and language fields.");
-      setIsErrorPopupVisible(true);
-      return;
-    }
-    if (
-      deckInfo.cards.some(
-        (card) =>
-          (card.front.trim() + "" + card.back.trim()).split("").length < 2
-      )
-    ){
-      setErrorMessage("Each card should have at least 2 total words (front and back combined).");
-      setIsErrorPopupVisible(true);
-      
-      return;
-    }
-  
-    try {
-      // Check if the language already exists
-      const languageDocRef = doc(db, "languages", deckInfo.language);
-      const languageDocSnapshot = await getDoc(languageDocRef);
-  
-      if (!languageDocSnapshot.exists()) {
-        // If the language doesn't exist, create it
-        await setDoc(languageDocRef, { name: deckInfo.language });
-      }
-  
-      // Check if the deck already exists within the language
-      const deckQuery = query(
-        collection(languageDocRef, "decks"),
-        where("name", "==", deckInfo.deckName)
-      );
-      const deckQuerySnapshot = await getDocs(deckQuery);
-  
-      if (!deckQuerySnapshot.empty) {
-        setErrorMessage("A deck with the same name already exists. Please choose a different deck name.");
-        setIsErrorPopupVisible(true);
-        return;
-      }
-  
-      // If the language and deck are valid, create the deck
-      console.log(user.id);
-      const deckDocRef = doc(languageDocRef, "decks", deckInfo.deckName);
-      await setDoc(deckDocRef, {
-        name: deckInfo.deckName,
-        creatorUser: user.id,
-        accessUser: [{"userId":user.id}],
-      });
-  
-      const flashcardsCollectionRef = collection(deckDocRef, "flashcards");
-      await Promise.all(deckInfo.cards.map(async (card) => {
-        await addDoc(flashcardsCollectionRef, {
-          front: card.front,
-          back: card.back,
-        });
-      }));
-  
-      setIsSuccessPopupVisible(true);
-  
-      setDeckInfo({
-        deckName: "",
-        language: "",
-        cards: [
-          { front: "", back: "" },
-          { front: "", back: "" },
-        ],
-
-      });
-    } catch (error) {
-      console.error("Error creating deck:", error);
-    }
+    handleSubmit(
+      deckInfo,
+      user,
+      setIsErrorPopupVisible,
+      setIsSuccessPopupVisible,
+      setErrorMessage,
+      setDeckInfo
+    );
   };
   
 
@@ -183,7 +96,7 @@ const AddDeck = () => {
             Upload JSON File
           </div>
         </nav>
-        <form className="w-full max-w-md" onSubmit={handleSubmit}>
+        <form className="w-full max-w-md" onSubmit={handleFormSubmit}>
           {selectedOption === "upload" && (
             <div className="mb-4">
               <label className="block text-gray-700 font-semibold mb-2">

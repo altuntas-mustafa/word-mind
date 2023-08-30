@@ -1,34 +1,26 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux'; // Import useSelector and useDispatch from react-redux
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { setUser } from '../redux/reducers/user'; // Import the setUser action
 import Login from './Login';
+import { UserInfo } from '../JS/UserInfo';
 
 const DashBoard = () => {
-  const firebaseAuth = getAuth();
   const user = useSelector(state => state.user); // Access user info from Redux store
   console.log(user);
   const dispatch = useDispatch(); // Get the dispatch function from Redux
   const [isLoading, setIsLoading] = React.useState(true); // State to track loading status
 
-  // Fetch user information again when the component mounts
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
-      if (user) {
-        // If user is logged in, dispatch the setUser action to update the store
-        dispatch(setUser({
-          id: user.uid,
-          displayName: user.displayName,
-          email: user.email,
-        }));
-      }
-      setIsLoading(false); // Mark loading as complete
-    });
+    // Define an async function
+    async function fetchUserInfoAsync() {
+      await UserInfo(dispatch); // Await the UserInfo function
+      setIsLoading(false);
+    }
+  
+    // Call the async function
+    fetchUserInfoAsync();
+  }, [dispatch]);
+  
 
-    return () => {
-      unsubscribe(); // Cleanup the auth state listener
-    };
-  }, [dispatch, firebaseAuth]); // Make sure to include dispatch and firebaseAuth in the dependency array
 
   return (
     <div className="container mx-auto p-4">
