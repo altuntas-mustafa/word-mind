@@ -64,34 +64,55 @@ const Deck = () => {
 
   async function handleLike(deckId) {
     try {
-      const deckRef = doc(db, "decks", deckId);
-      const deckSnapshot = await getDoc(deckRef);
-      const deckData = deckSnapshot.data();
+        const languagesCollectionRef = collection(db, "languages");
 
-      const currentUser = auth.currentUser; // Assuming you have auth setup
-      const isLikedByUser = deckData.accessUser.some(
-        (user) => user.userId === currentUser.uid
-      );
+        const languagesQuerySnapshot = await getDocs(languagesCollectionRef);
 
-      let updatedAccessUser;
-      if (isLikedByUser) {
-        updatedAccessUser = deckData.accessUser.filter(
-          (user) => user.userId !== currentUser.uid
-        );
-      } else {
-        updatedAccessUser = [
-          ...deckData.accessUser,
-          { userId: currentUser.uid },
-        ];
-      }
+        for (const languageDoc of languagesQuerySnapshot.docs) {
+            const languageId = languageDoc.id;
 
-      await updateDoc(deckRef, { accessUser: updatedAccessUser });
+            const decksCollectionRef = collection(
+                db,
+                `languages/${languageId}/decks`
+            );
 
-      fetchLanguagesAndDecksFromFirebase();
+            const deckDoc = await getDoc(doc(decksCollectionRef, deckId));
+
+            if (deckDoc.exists()) {
+                const deckData = deckDoc.data();
+                const currentUser = auth.currentUser;
+
+                if (!currentUser) {
+                    console.log("User not authenticated");
+                    return;
+                }
+
+                const isLikedByUser = Array.isArray(deckData.accessUser) &&
+                    deckData.accessUser.some((user) => user.userId === currentUser.uid);
+
+                const deckRef = doc(decksCollectionRef, deckId);
+
+                let updatedAccessUser;
+                if (isLikedByUser) {
+                    updatedAccessUser = deckData.accessUser.filter(
+                        (user) => user.userId !== currentUser.uid
+                    );
+                } else {
+                    updatedAccessUser = [
+                        ...deckData.accessUser,
+                        { userId: currentUser.uid },
+                    ];
+                }
+
+                await updateDoc(deckRef, { accessUser: updatedAccessUser });
+            }
+        }
+
+        fetchLanguagesAndDecksFromFirebase();
     } catch (error) {
-      console.error("Error handling like:", error);
+        console.error("Error handling like:", error);
     }
-  }
+}
 
   useEffect(() => {
     fetchLanguagesAndDecksFromFirebase();
@@ -152,34 +173,34 @@ const Deck = () => {
           </div>
         </div>
 
-        <div className="space-y-4 ml-10  ">
-          {languages.map((language) => (
-            <div key={language.id}>
-            <h2 className="text-4xl font-semibold mb-2">{language.id}</h2>
-            <ul className="space-y-2 ml-10">
-              {language.decks.map((deck) => (
-                <li key={deck.id} className="flex items-center">
-                  <Link
-                    to={`/languages/${encodeURIComponent(language.id)}/decks/${encodeURIComponent(deck.name)}`}
-                    className="text-blue-500 hover:underline block transition duration-300 ease-in-out transform hover:scale-105 text-2xl"
-                  >
-                    {deck.name}
-                  </Link>
-                  <button
-                    onClick={() => handleLike(deck.id)}
-                    className={`ml-2 px-3 py-1 rounded text-white ${
-                      deck.isLikedByUser ? "bg-red-500" : "bg-gray-500"
-                    }`}
-                  >
-                    {deck.isLikedByUser ? "Liked" : "Like"}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-          
-          ))}
-        </div>
+        <div className="space-y-6 ml-4 sm:ml-10">
+  {languages.map((language) => (
+    <div key={language.id} className="border border-gray-200 p-4 rounded shadow-md">
+      <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-2">{language.id}</h2>
+      <ul className="space-y-3">
+        {language.decks.map((deck) => (
+          <li key={deck.id} className="flex items-center space-x-3">
+            <Link
+              to={`/languages/${encodeURIComponent(language.id)}/decks/${encodeURIComponent(deck.name)}`}
+              className="text-blue-500 hover:underline transition duration-300 ease-in-out transform hover:scale-105 text-lg sm:text-xl"
+            >
+              {deck.name}
+            </Link>
+            <button
+              onClick={() => handleLike(deck.id)}
+              className={`px-4 py-2 rounded-full font-semibold ${
+                deck.isLikedByUser ? "bg-red-500 text-white" : "bg-gray-200 text-gray-700"
+              } hover:bg-opacity-80 transition-colors duration-300`}
+            >
+              {deck.isLikedByUser ? "Liked" : "Like"}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  ))}
+</div>
+
       </div>
     </div>
   );
