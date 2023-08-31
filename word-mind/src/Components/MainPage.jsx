@@ -5,7 +5,7 @@ import Deck from '../JS/Deck';
 function MainPage() {
   return (
     <>
-    <div className="bg-black h-screen  justify-center items-center">
+    <div className=" bg-gray-300 rounded-lg shadow-md justify-center items-center">
     <Home />
     <Deck />
     </div>

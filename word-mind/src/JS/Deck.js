@@ -24,6 +24,7 @@ const Deck = () => {
 
       for (const languageDoc of languagesQuerySnapshot.docs) {
         const languageId = languageDoc.id;
+        const currentUser = auth.currentUser;
 
         const languageData = {
           id: languageId,
@@ -42,9 +43,8 @@ const Deck = () => {
           // Check if the current user has liked the deck
           const isLikedByUser =
             Array.isArray(deckData.accessUser) &&
-            deckData.accessUser.some((user) => {
-              return user.userId === user.userId;
-            });
+            deckData.accessUser.some((user) => user.userId === currentUser.uid);
+
 
           languageData.decks.push({
             id: deckId,
@@ -119,8 +119,8 @@ const Deck = () => {
   }, []);
 
   return (
-    <div className="p-5 min-h-screen bg-black flex justify-center  ">
-      <div className="bg-white p-3 rounded-lg shadow-lg w-full md:w-1/2 lg:w-1/3">
+    <div className="p-5 min-h-screen  flex justify-center ">
+      <div className=" p-3 bg-gray-100 shadow-md rounded-lg  w-full md:w-1/2 lg:w-1/3">
         <h1 className="text-4xl font-bold mb-4 flex justify-center items-center">
           DECK LISTS
         </h1>
@@ -175,7 +175,7 @@ const Deck = () => {
 
         <div className="space-y-6 ml-4 sm:ml-10">
   {languages.map((language) => (
-    <div key={language.id} className="border border-gray-200 p-4 rounded shadow-md">
+    <div key={language.id} className="border border-gray-200 p-4 rounded shadow-md mr-7">
       <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-2">{language.id}</h2>
       <ul className="space-y-3">
         {language.decks.map((deck) => (
@@ -190,9 +190,43 @@ const Deck = () => {
               onClick={() => handleLike(deck.id)}
               className={`px-4 py-2 rounded-full font-semibold ${
                 deck.isLikedByUser ? "bg-red-500 text-white" : "bg-gray-200 text-gray-700"
-              } hover:bg-opacity-80 transition-colors duration-300`}
+              } hover:bg-opacity-80 transition-colors duration-300 flex items-center space-x-2`}
             >
-              {deck.isLikedByUser ? "Liked" : "Like"}
+              {deck.isLikedByUser ? (
+                <>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M6.293 9.293a1 1 0 011.414 0L10 11.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  Added
+                </>
+              ) : (
+                <>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 2C5.58 2 2 5.58 2 10s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 14c-1.054 0-2.07-.21-3-.588A4.27 4.27 0 007 10.412V7.588A4.27 4.27 0 0010 6a4.27 4.27 0 003-.588V10.41c0 .487.135.956.37 1.362A3.998 3.998 0 0110 16z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  Add
+                </>
+              )}
             </button>
           </li>
         ))}
