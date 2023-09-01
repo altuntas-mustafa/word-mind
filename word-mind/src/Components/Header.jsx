@@ -25,9 +25,9 @@ export default function Header() {
           Word-Mind
         </a>
         <nav>
-          <section className="lg:hidden font-abel">
+          <section className="lg:hidden font-abel text-3xl  ">
             <div
-              className="space-y-2"
+              className="space-y-2 "
               onClick={() => setIsNavOpen((prev) => !prev)}
             >
               <span className="block h-0.5 w-8 animate-pulse bg-gray-600"></span>
@@ -36,7 +36,7 @@ export default function Header() {
             </div>
 
             {isNavOpen && (
-              <div className="fixed top-0 left-0 w-full h-full bg-white z-10 flex flex-col justify-evenly items-center ">
+              <div className="fixed top-0 left-0 w-full h-full bg-white z-10 flex flex-col justify-evenly items-center  ">
                 <div
                   className="absolute top-0 right-0 px-8 py-8"
                   onClick={() => setIsNavOpen(false)}
@@ -56,20 +56,20 @@ export default function Header() {
                 </div>
                 <ul className="flex flex-col items-center justify-between min-h-[250px] bg-white backdrop-blur-md rounded-lg p-6 space-y-4 ">
                   <li>
-                    <a href="/" className="text-lg text-gray-700 hover:text-yellow-300 ">Home</a>
+                    <a href="/" className=" text-gray-700 hover:text-yellow-300 ">Home</a>
                   </li>
                   <li>
-                    <a href="/createdecks" className="text-lg text-gray-700 hover:text-yellow-300">Create Deck</a>
+                    <a href="/createdecks" className=" text-gray-700 hover:text-yellow-300">Create Deck</a>
                   </li>
                   <li>
-                    <a href="/dashboard" className="text-lg text-gray-700 hover:text-yellow-300">DashBoard</a>
+                    <a href="/dashboard" className="text-gray-700 hover:text-yellow-300">DashBoard</a>
                   </li>
                   {/* Conditionally show login or logout link */}
                   {isLoggedIn ? (
                     <li>
                       <a
                         href="/logout"
-                        className="text-lg text-gray-700 hover:text-yellow-300"
+                        className=" text-gray-700 hover:text-yellow-300"
                       >
                         Logout
                       </a>
@@ -78,7 +78,7 @@ export default function Header() {
                     <li>
                       <a
                         href="/login"
-                        className="text-lg text-gray-700 hover:text-yellow-300"
+                        className=" text-gray-700 hover:text-yellow-300"
                       >
                         Login
                       </a>
