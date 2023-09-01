@@ -204,7 +204,7 @@ const Deck = () => {
   return (
     <div className="p-5 min-h-screen  flex justify-center ">
       <div className=" p-3 bg-gray-100 shadow-md rounded-lg  w-full md:w-1/2 lg:w-1/3">
-        <h1 className="text-4xl font-bold mb-4 flex justify-center items-center">
+        <h1 className="text-4xl  mb-4 flex justify-center items-center font-raleway">
           DECK LISTS
         </h1>
         <div className="flex flex-col md:flex-row md:items-center md:justify-center md:space-x-2 mb-4">
@@ -259,7 +259,7 @@ const Deck = () => {
         <div className="space-y-6 ml-4 sm:ml-10">
   {languages.map((language) => (
     <div key={language.id} className="border border-gray-200 p-4 rounded shadow-md mr-7">
-      <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-2">{language.id}</h2>
+      <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-2 text-center font-['Roboto']">{language.id}</h2>
       <ul className="space-y-3">
         {language.decks.map((deck) => (
           <li key={deck.id} className="flex items-center space-x-3">
