@@ -227,7 +227,7 @@ const Deck = () => {
                   }`}
                 ></div>
               </div>
-              <span className="ml-2">Random Order</span>
+              <span className="ml-2 font-abel">Random Order</span>
             </label>
           </div>
           <div className="flex items-center">
@@ -251,7 +251,7 @@ const Deck = () => {
                   }`}
                 ></div>
               </div>
-              <span className="ml-2">Random Side</span>
+              <span className="ml-2 font-abel">Random Side</span>
             </label>
           </div>
         </div>
@@ -260,7 +260,7 @@ const Deck = () => {
   {languages.map((language) => (
     <div key={language.id} className="border border-gray-200 p-4 rounded shadow-md mr-7">
       <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-2 text-center font-['Roboto']">{language.id}</h2>
-      <ul className="space-y-3">
+      <ul className="space-y-3 font-abel">
         {language.decks.map((deck) => (
           <li key={deck.id} className="flex items-center space-x-3">
             <Link

@@ -12,6 +12,9 @@ module.exports = {
       'raleway': ['Raleway', 'sans-serif'],
       'dancing': ['"Dancing Script"', 'cursive'],
       'abel': ['Abel', 'sans-serif'],
+      'modak': ['Modak', 'cursive'],
+      'rubik':['Rubik Pixels', 'cursive'],
+      'eater':[ 'Eater', 'cursive']
     },
   },
   plugins: [],

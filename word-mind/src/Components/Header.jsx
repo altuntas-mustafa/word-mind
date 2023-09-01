@@ -19,9 +19,9 @@ export default function Header() {
   }, []);
 
   return (
-    <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 border-b border-gray-400 py-8">
+    <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 border-b border-gray-400 p-6">
       <div className="container mx-auto px-4 flex items-center justify-between">
-        <a href="/" className="text-3xl font-semibold whitespace-nowrap text-white hover:text-yellow-300">
+        <a href="/" className="text-4xl font-eater  whitespace-nowrap text-white hover:text-yellow-300 ">
           Word-Mind
         </a>
         <nav>
@@ -89,17 +89,17 @@ export default function Header() {
             )}
           </section>
 
-          <ul className="hidden space-x-8 lg:flex font-abel">
+          <ul className="hidden text-2xl  space-x-8 lg:flex font-abel">
             
             <li>
-              <a href="/" className="text-xl text-white hover:text-yellow-300 ">
+              <a href="/" className=" text-white hover:text-yellow-300 ">
                 Home
               </a>
             </li>
             <li>
               <a
                 href="/createdecks"
-                className="text-xl text-white hover:text-yellow-300 "
+                className=" text-white hover:text-yellow-300 "
               >
                 Create Deck
               </a>
@@ -107,7 +107,7 @@ export default function Header() {
             <li>
               <a
                 href="/dashboard"
-                className="text-xl text-white hover:text-yellow-300"
+                className="text-white hover:text-yellow-300"
               >
                 DashBoard
               </a>
@@ -117,7 +117,7 @@ export default function Header() {
               <li>
                 <a
                   href="/logout"
-                  className="text-xl text-white hover:text-yellow-300"
+                  className=" text-white hover:text-yellow-300"
                 >
                   Logout
                 </a>
@@ -126,7 +126,7 @@ export default function Header() {
               <li>
                 <a
                   href="/login"
-                  className="text-xl text-white hover:text-yellow-300"
+                  className="text-white hover:text-yellow-300"
                 >
                   Login
                 </a>
