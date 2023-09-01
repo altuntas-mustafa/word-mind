@@ -24,6 +24,9 @@ const Deck = () => {
 
       for (const languageDoc of languagesQuerySnapshot.docs) {
         const languageId = languageDoc.id;
+        
+        const currentUser = auth.currentUser;
+
         const languageData = {
           id: languageId,
           decks: [],
@@ -38,7 +41,7 @@ const Deck = () => {
         for (const deckDoc of decksQuerySnapshot.docs) {
           const deckId = deckDoc.id;
           const deckData = deckDoc.data();
-        
+
 
           languageData.decks.push({
             id: deckId,

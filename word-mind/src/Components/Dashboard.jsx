@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { UserInfo } from '../JS/UserInfo';
 import Login from './Login';
-import { collection, query, where, getDocs, getDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, getDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebase';
 import { Link } from 'react-router-dom';
 
@@ -12,7 +12,6 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [languageData, setLanguageData] = useState([]);
 
-
   useEffect(() => {
     async function fetchUserInfoAsync() {
       await UserInfo(dispatch);
@@ -21,54 +20,53 @@ const Dashboard = () => {
     }
 
     fetchUserInfoAsync();
-  }, [dispatch]);
+  }, [dispatch,user]);
 
   async function fetchUserLikedDecks() {
-    const languagesCollectionRef = collection(db, 'languages');
-    const languagesQuerySnapshot = await getDocs(languagesCollectionRef);
-  
-    const user = auth.currentUser;
-    const userLikedDeckIds = [];
-  
-    // Fetch user-liked deck IDs
-    if (user) {
-      const userDocRef = doc(db, 'users', user.uid);
-      const userDocSnapshot = await getDoc(userDocRef);
-      const userData = userDocSnapshot.data();
-  
-      if (userData && userData.likedDecks) {
-        userLikedDeckIds.push(...userData.likedDecks);
+    try {
+      const languagesCollectionRef = collection(db, 'languages');
+      const languagesQuerySnapshot = await getDocs(languagesCollectionRef);
+
+      const currentUser = auth.currentUser;
+
+      if (!currentUser) {
+        console.log('User not authenticated');
+        return;
       }
-    }
-  
-    const languageDataArray = [];
-  
-    for (const languageDoc of languagesQuerySnapshot.docs) {
-      const languageId = languageDoc.id;
-  
-      const decksCollectionRef = collection(db, `languages/${languageId}/decks`);
-      const decksQuerySnapshot = await getDocs(decksCollectionRef);
-  
-      const userLikedDecks = [];
-      for (const deckDoc of decksQuerySnapshot.docs) {
-        const deckId = deckDoc.id;
-        const deckData = deckDoc.data();
-  
-        const isLikedByUser = userLikedDeckIds.includes(deckId);
-  
-        if (isLikedByUser) {
-          userLikedDecks.push({ id: deckId, ...deckData });
+
+      const languageDataArray = [];
+
+      for (const languageDoc of languagesQuerySnapshot.docs) {
+        const languageId = languageDoc.id;
+        const decksCollectionRef = collection(db, `languages/${languageId}/decks`);
+        const decksQuerySnapshot = await getDocs(decksCollectionRef);
+
+        const userLikedDecks = [];
+
+        for (const deckDoc of decksQuerySnapshot.docs) {
+          const deckId = deckDoc.id;
+          const deckData = deckDoc.data();
+
+          const isLikedByUser =
+            Array.isArray(deckData.accessUser) &&
+            deckData.accessUser.some((user) => user.userId === currentUser.uid);
+
+          if (isLikedByUser) {
+            userLikedDecks.push({ id: deckId, ...deckData });
+          }
+        }
+
+        if (userLikedDecks.length > 0) {
+          languageDataArray.push({ id: languageId, userLikedDecks });
         }
       }
-  
-      if (userLikedDecks.length > 0) {
-        languageDataArray.push({ id: languageId, userLikedDecks });
-      }
+
+      setLanguageData(languageDataArray);
+    } catch (error) {
+      console.error('Error fetching user-liked decks:', error);
     }
-  
-    setLanguageData(languageDataArray);
   }
-  console.log(languageData);
+
   return (
     <div className="container mx-auto p-4">
       {isLoading ? (
