@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { UserInfo } from '../JS/UserInfo';
 import Login from './Login';
-import { collection, getDocs, getDoc } from 'firebase/firestore';
+import { collection, getDocs, getDoc, doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebase';
 import { Link } from 'react-router-dom';
 
@@ -16,11 +16,36 @@ const Dashboard = () => {
     async function fetchUserInfoAsync() {
       await UserInfo(dispatch);
       await fetchUserLikedDecks();
+      await addCurrentUserToUsersCollection();
       setIsLoading(false);
     }
 
     fetchUserInfoAsync();
   }, [dispatch,user]);
+
+  async function addCurrentUserToUsersCollection() {
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+      console.log('User not authenticated');
+      return;
+    }
+
+    const userDocRef = doc(db, 'users', currentUser.uid);
+
+    try {
+      const userDocSnapshot = await getDoc(userDocRef);
+
+      if (!userDocSnapshot.exists()) {
+        // If the document doesn't exist, create it with the user's UID
+        await setDoc(userDocRef, {
+          userId: currentUser.uid
+        });
+      }
+    } catch (error) {
+      console.error('Error adding current user to "users" collection:', error);
+    }
+  }
 
   async function fetchUserLikedDecks() {
     try {

@@ -41,7 +41,6 @@ const Deck = () => {
         for (const deckDoc of decksQuerySnapshot.docs) {
           const deckId = deckDoc.id;
           const deckData = deckDoc.data();
-          
           if (auth.currentUser){
           const currentUser = auth.currentUser;
             // Check if the current user has liked the deck
@@ -76,9 +75,15 @@ const Deck = () => {
   async function handleLike(deckId) {
     try {
         const languagesCollectionRef = collection(db, "languages");
+        const usersCollectionRef = collection(db, "users");
 
         const languagesQuerySnapshot = await getDocs(languagesCollectionRef);
+        const usersQuerySnapshot = await getDocs(usersCollectionRef);
+        
+        for (const userDoc of usersQuerySnapshot.docs) {
+          console.log("data",userDoc.id);
 
+        }
         for (const languageDoc of languagesQuerySnapshot.docs) {
             const languageId = languageDoc.id;
 
