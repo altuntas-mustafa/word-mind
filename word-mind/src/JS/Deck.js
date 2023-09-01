@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { collection, getDocs, doc, updateDoc, getDoc, setDoc, runTransaction } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  doc,
+  updateDoc,
+  getDoc,
+  setDoc,
+  runTransaction,
+} from "firebase/firestore";
 import { auth, db } from "../firebase/firebase";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setOrder, setDisplayOrder } from "../redux/reducers/reducers";
-
 
 const Deck = () => {
   const [languages, setLanguages] = useState([]);
@@ -24,8 +31,6 @@ const Deck = () => {
 
       for (const languageDoc of languagesQuerySnapshot.docs) {
         const languageId = languageDoc.id;
-        
-
 
         const languageData = {
           id: languageId,
@@ -41,26 +46,26 @@ const Deck = () => {
         for (const deckDoc of decksQuerySnapshot.docs) {
           const deckId = deckDoc.id;
           const deckData = deckDoc.data();
-          if (auth.currentUser){
-          const currentUser = auth.currentUser;
+          if (auth.currentUser) {
+            const currentUser = auth.currentUser;
             // Check if the current user has liked the deck
             const isLikedByUser =
               Array.isArray(deckData.accessUser) &&
-              deckData.accessUser.some((user) => user.userId === currentUser.uid);
+              deckData.accessUser.some(
+                (user) => user.userId === currentUser.uid
+              );
 
-              languageData.decks.push({
-                id: deckId,
-                isLikedByUser: isLikedByUser,
-                ...deckData,
-              });
+            languageData.decks.push({
+              id: deckId,
+              isLikedByUser: isLikedByUser,
+              ...deckData,
+            });
           } else {
-
             languageData.decks.push({
               id: deckId,
               ...deckData,
             });
           }
-
         }
 
         languagesData.push(languageData);
@@ -74,107 +79,110 @@ const Deck = () => {
 
   async function addLanguageAndDeckToUser(languageId, deckId) {
     const currentUser = auth.currentUser;
-  
+
     if (!currentUser) {
-      console.log('User not authenticated');
+      console.log("User not authenticated");
       return;
     }
-  
+
     try {
       // Fetch the deck info from the languages collection
-      const languagesCollectionRef = collection(db, 'languages');
+      const languagesCollectionRef = collection(db, "languages");
       const languageDocRef = doc(languagesCollectionRef, languageId);
-      const deckCollectionRef = collection(languageDocRef, 'decks');
+      const deckCollectionRef = collection(languageDocRef, "decks");
       const deckDocRef = doc(deckCollectionRef, deckId);
       const deckDocSnapshot = await getDoc(deckDocRef);
-  
+
       if (deckDocSnapshot.exists()) {
         const deckInfo = deckDocSnapshot.data();
-        const userDocRef = doc(db, 'users', currentUser.uid);
-  
+        const userDocRef = doc(db, "users", currentUser.uid);
+
         // Create a reference to the "flashcards" collection under the deck document
-        const flashcardsCollectionRef = collection(deckDocRef, 'flashcards');
+        const flashcardsCollectionRef = collection(deckDocRef, "flashcards");
         const flashcardsQuerySnapshot = await getDocs(flashcardsCollectionRef);
-  
+
         // Retrieve flashcard data as an array
         const flashcardsData = flashcardsQuerySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-  
+
         // Update the user document structure with flashcard data
         await runTransaction(db, async (transaction) => {
           const userDocSnapshot = await transaction.get(userDocRef);
-  
+
           if (userDocSnapshot.exists()) {
             const userData = userDocSnapshot.data();
-  
+
             if (!userData.languages) {
               userData.languages = {}; // Initialize the languages object if it doesn't exist
             }
-  
+
             if (!userData.languages[languageId]) {
               userData.languages[languageId] = {}; // Initialize the language object if it doesn't exist
             }
-  
+
             if (!userData.languages[languageId].decks) {
               userData.languages[languageId].decks = {}; // Initialize the decks object if it doesn't exist
             }
-  
+
             // Add deck info under user.id/language/decks/deckId
             userData.languages[languageId].decks[deckId] = deckInfo;
-  
+
             // Add flashcard data under user.id/language/decks/deckId/flashcards
-            userData.languages[languageId].decks[deckId].flashcards = flashcardsData;
-  
+            userData.languages[languageId].decks[deckId].flashcards =
+              flashcardsData;
+
             // Update the user document with the new data
             transaction.set(userDocRef, userData);
           }
         });
       }
     } catch (error) {
-      console.error('Error adding language, deck, and flashcards to user:', error);
+      console.error(
+        "Error adding language, deck, and flashcards to user:",
+        error
+      );
     }
   }
-  
-  
-  
+
   async function handleLike(deckId) {
     try {
-      const languagesCollectionRef = collection(db, 'languages');
-      const usersCollectionRef = collection(db, 'users');
-  
+      const languagesCollectionRef = collection(db, "languages");
+      const usersCollectionRef = collection(db, "users");
+
       const languagesQuerySnapshot = await getDocs(languagesCollectionRef);
       const usersQuerySnapshot = await getDocs(usersCollectionRef);
-  
+
       // for (const userDoc of usersQuerySnapshot.docs) {
       //   console.log('data', userDoc.id);
       // }
-  
+
       for (const languageDoc of languagesQuerySnapshot.docs) {
         const languageId = languageDoc.id;
-  
+
         const decksCollectionRef = collection(
           db,
           `languages/${languageId}/decks`
         );
-  
+
         const deckDoc = await getDoc(doc(decksCollectionRef, deckId));
-  
+
         if (deckDoc.exists()) {
           const deckData = deckDoc.data();
           const currentUser = auth.currentUser;
-  
+
           if (!currentUser) {
-            console.log('User not authenticated');
+            console.log("User not authenticated");
             return;
           }
-  
-          const isLikedByUser = Array.isArray(deckData.accessUser) &&
+
+          const isLikedByUser =
+            Array.isArray(deckData.accessUser) &&
             deckData.accessUser.some((user) => user.userId === currentUser.uid);
-  
+
           const deckRef = doc(decksCollectionRef, deckId);
-  
+
           let updatedAccessUser;
           if (isLikedByUser) {
             updatedAccessUser = deckData.accessUser.filter(
@@ -186,17 +194,17 @@ const Deck = () => {
               { userId: currentUser.uid },
             ];
           }
-  
+
           await updateDoc(deckRef, { accessUser: updatedAccessUser });
         }
       }
-  
+
       fetchLanguagesAndDecksFromFirebase();
     } catch (error) {
-      console.error('Error handling like:', error);
+      console.error("Error handling like:", error);
     }
   }
-  
+
   useEffect(() => {
     fetchLanguagesAndDecksFromFirebase();
   }, []);
@@ -257,70 +265,65 @@ const Deck = () => {
         </div>
 
         <div className="space-y-6 ml-4 sm:ml-10">
-  {languages.map((language) => (
-    <div key={language.id} className="border border-gray-200 p-4 rounded shadow-md mr-7">
-      <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-2 text-center font-['Roboto']">{language.id}</h2>
-      <ul className="space-y-3 font-abel">
-        {language.decks.map((deck) => (
-          <li key={deck.id} className="flex items-center space-x-3">
-            <Link
-              to={`/languages/${encodeURIComponent(language.id)}/decks/${encodeURIComponent(deck.name)}`}
-              className="text-blue-500 hover:underline transition duration-300 ease-in-out transform hover:scale-105 text-lg sm:text-xl"
+          {languages.map((language) => (
+            <div
+              key={language.id}
+              className="border border-gray-200 p-4 rounded shadow-md mr-7"
             >
-              {deck.name}
-            </Link>
-            <button
-              onClick={() => {
-                addLanguageAndDeckToUser(language.id, deck.id)
-                handleLike(deck.id)}             
-              } 
-              className={`px-4 py-2 rounded-full font-semibold ${
-                deck.isLikedByUser ? "bg-red-500 text-white" : "bg-gray-200 text-gray-700"
-              } hover:bg-opacity-80 transition-colors duration-300 flex items-center space-x-2`}
-            >
-              {deck.isLikedByUser ? (
-                <>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M6.293 9.293a1 1 0 011.414 0L10 11.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  Added
-                </>
-              ) : (
-                <>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 2C5.58 2 2 5.58 2 10s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 14c-1.054 0-2.07-.21-3-.588A4.27 4.27 0 007 10.412V7.588A4.27 4.27 0 0010 6a4.27 4.27 0 003-.588V10.41c0 .487.135.956.37 1.362A3.998 3.998 0 0110 16z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  Add
-                </>
-              )}
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
-  ))}
-</div>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-2 text-center font-['Roboto']">
+                {language.id}
+              </h2>
+              <ul className="space-y-3 font-abel">
+                {language.decks.map((deck) => (
+                  <li key={deck.id} className="flex items-center space-x-3">
+                    <Link
+                      to={`/languages/${encodeURIComponent(
+                        language.id
+                      )}/decks/${encodeURIComponent(deck.name)}`}
+                      className="text-blue-500 hover:underline transition duration-300 ease-in-out transform hover:scale-105 text-lg sm:text-xl"
+                    >
+                      {deck.name}
+                    </Link>
+                    <button
+                      onClick={() => {
+                        addLanguageAndDeckToUser(language.id, deck.id);
+                        handleLike(deck.id);
+                      }}
+                      className={`px-4 py-2 rounded-full font-semibold ${
+                        deck.isLikedByUser
+                          ? "bg-green-400 text-white"
+                          : "bg-gray-200 text-gray-700"
+                      } hover:bg-opacity-80 transition-colors duration-300 flex items-center space-x-2`}
+                    >
+                      {deck.isLikedByUser ? (
+                        <>
+                          <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"/></svg>
+                         <div>
+                          Added
+                          </div>
+                        
+                        </>
+                      ) : (
+                        <>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            height="1em"
+                            viewBox="0 0 512 512"
+                          >
+                            <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H280v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z" />
+                          </svg><div>
+                          Add
 
+                          </div>
+                        </>
+                      )}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
