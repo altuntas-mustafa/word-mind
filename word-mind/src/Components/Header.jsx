@@ -25,7 +25,7 @@ export default function Header() {
           Word-Mind
         </a>
         <nav>
-          <section className="lg:hidden">
+          <section className="lg:hidden font-abel">
             <div
               className="space-y-2"
               onClick={() => setIsNavOpen((prev) => !prev)}
