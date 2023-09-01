@@ -9,7 +9,7 @@ function App() {
   return (
     <Provider store={store}>
       <Router>
-        <div className="container mx-auto mb-8 px-8">
+        <div className="container mx-auto mb-8 px-8 ">
           <Header />
           <h1 className="mt-8 text-center text-3xl font-bold">
             Your App's Main Content

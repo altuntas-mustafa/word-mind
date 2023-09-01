@@ -11,6 +11,7 @@ module.exports = {
       'body': ['"Open Sans"'],
       'raleway': ['Raleway', 'sans-serif'],
       'dancing': ['"Dancing Script"', 'cursive'],
+      'abel': ['Abel', 'sans-serif'],
     },
   },
   plugins: [],

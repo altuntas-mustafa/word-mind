@@ -36,7 +36,7 @@ export default function Header() {
             </div>
 
             {isNavOpen && (
-              <div className="fixed top-0 left-0 w-full h-full bg-white z-10 flex flex-col justify-evenly items-center">
+              <div className="fixed top-0 left-0 w-full h-full bg-white z-10 flex flex-col justify-evenly items-center ">
                 <div
                   className="absolute top-0 right-0 px-8 py-8"
                   onClick={() => setIsNavOpen(false)}
@@ -54,9 +54,9 @@ export default function Header() {
                     <line x1="6" y1="6" x2="18" y2="18" />
                   </svg>
                 </div>
-                <ul className="flex flex-col items-center justify-between min-h-[250px] bg-white backdrop-blur-md rounded-lg p-6 space-y-4">
+                <ul className="flex flex-col items-center justify-between min-h-[250px] bg-white backdrop-blur-md rounded-lg p-6 space-y-4 ">
                   <li>
-                    <a href="/" className="text-lg text-gray-700 hover:text-yellow-300">Home</a>
+                    <a href="/" className="text-lg text-gray-700 hover:text-yellow-300 ">Home</a>
                   </li>
                   <li>
                     <a href="/createdecks" className="text-lg text-gray-700 hover:text-yellow-300">Create Deck</a>
@@ -89,16 +89,17 @@ export default function Header() {
             )}
           </section>
 
-          <ul className="hidden space-x-8 lg:flex">
+          <ul className="hidden space-x-8 lg:flex font-abel">
+            
             <li>
-              <a href="/" className="text-xl text-white hover:text-yellow-300">
+              <a href="/" className="text-xl text-white hover:text-yellow-300 ">
                 Home
               </a>
             </li>
             <li>
               <a
                 href="/createdecks"
-                className="text-xl text-white hover:text-yellow-300"
+                className="text-xl text-white hover:text-yellow-300 "
               >
                 Create Deck
               </a>

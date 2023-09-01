@@ -204,7 +204,7 @@ const Deck = () => {
   return (
     <div className="p-5 min-h-screen  flex justify-center ">
       <div className=" p-3 bg-gray-100 shadow-md rounded-lg  w-full md:w-1/2 lg:w-1/3">
-        <h1 className="text-4xl  mb-4 flex justify-center items-center font-raleway">
+        <h1 className="text-4xl  mb-4 flex justify-center items-center font-abel">
           DECK LISTS
         </h1>
         <div className="flex flex-col md:flex-row md:items-center md:justify-center md:space-x-2 mb-4">
