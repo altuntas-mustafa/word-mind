@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { collection, getDocs, doc, updateDoc, getDoc } from "firebase/firestore";
+import { collection, getDocs, doc, updateDoc, getDoc, setDoc, runTransaction } from "firebase/firestore";
 import { auth, db } from "../firebase/firebase";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -72,64 +72,131 @@ const Deck = () => {
     }
   }
 
+  async function addLanguageAndDeckToUser(languageId, deckId) {
+    const currentUser = auth.currentUser;
+  
+    if (!currentUser) {
+      console.log('User not authenticated');
+      return;
+    }
+  
+    try {
+      // Fetch the deck info from the languages collection
+      const languagesCollectionRef = collection(db, 'languages');
+      const languageDocRef = doc(languagesCollectionRef, languageId);
+      const deckCollectionRef = collection(languageDocRef, 'decks');
+      const deckDocRef = doc(deckCollectionRef, deckId);
+      const deckDocSnapshot = await getDoc(deckDocRef);
+  
+      if (deckDocSnapshot.exists()) {
+        const deckInfo = deckDocSnapshot.data();
+        const userDocRef = doc(db, 'users', currentUser.uid);
+  
+        // Create a reference to the "flashcards" collection under the deck document
+        const flashcardsCollectionRef = collection(deckDocRef, 'flashcards');
+        const flashcardsQuerySnapshot = await getDocs(flashcardsCollectionRef);
+  
+        // Retrieve flashcard data as an array
+        const flashcardsData = flashcardsQuerySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+  
+        // Update the user document structure with flashcard data
+        await runTransaction(db, async (transaction) => {
+          const userDocSnapshot = await transaction.get(userDocRef);
+  
+          if (userDocSnapshot.exists()) {
+            const userData = userDocSnapshot.data();
+  
+            if (!userData.languages) {
+              userData.languages = {}; // Initialize the languages object if it doesn't exist
+            }
+  
+            if (!userData.languages[languageId]) {
+              userData.languages[languageId] = {}; // Initialize the language object if it doesn't exist
+            }
+  
+            if (!userData.languages[languageId].decks) {
+              userData.languages[languageId].decks = {}; // Initialize the decks object if it doesn't exist
+            }
+  
+            // Add deck info under user.id/language/decks/deckId
+            userData.languages[languageId].decks[deckId] = deckInfo;
+  
+            // Add flashcard data under user.id/language/decks/deckId/flashcards
+            userData.languages[languageId].decks[deckId].flashcards = flashcardsData;
+  
+            // Update the user document with the new data
+            transaction.set(userDocRef, userData);
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error adding language, deck, and flashcards to user:', error);
+    }
+  }
+  
+  
+  
   async function handleLike(deckId) {
     try {
-        const languagesCollectionRef = collection(db, "languages");
-        const usersCollectionRef = collection(db, "users");
-
-        const languagesQuerySnapshot = await getDocs(languagesCollectionRef);
-        const usersQuerySnapshot = await getDocs(usersCollectionRef);
-        
-        for (const userDoc of usersQuerySnapshot.docs) {
-          console.log("data",userDoc.id);
-
-        }
-        for (const languageDoc of languagesQuerySnapshot.docs) {
-            const languageId = languageDoc.id;
-
-            const decksCollectionRef = collection(
-                db,
-                `languages/${languageId}/decks`
+      const languagesCollectionRef = collection(db, 'languages');
+      const usersCollectionRef = collection(db, 'users');
+  
+      const languagesQuerySnapshot = await getDocs(languagesCollectionRef);
+      const usersQuerySnapshot = await getDocs(usersCollectionRef);
+  
+      // for (const userDoc of usersQuerySnapshot.docs) {
+      //   console.log('data', userDoc.id);
+      // }
+  
+      for (const languageDoc of languagesQuerySnapshot.docs) {
+        const languageId = languageDoc.id;
+  
+        const decksCollectionRef = collection(
+          db,
+          `languages/${languageId}/decks`
+        );
+  
+        const deckDoc = await getDoc(doc(decksCollectionRef, deckId));
+  
+        if (deckDoc.exists()) {
+          const deckData = deckDoc.data();
+          const currentUser = auth.currentUser;
+  
+          if (!currentUser) {
+            console.log('User not authenticated');
+            return;
+          }
+  
+          const isLikedByUser = Array.isArray(deckData.accessUser) &&
+            deckData.accessUser.some((user) => user.userId === currentUser.uid);
+  
+          const deckRef = doc(decksCollectionRef, deckId);
+  
+          let updatedAccessUser;
+          if (isLikedByUser) {
+            updatedAccessUser = deckData.accessUser.filter(
+              (user) => user.userId !== currentUser.uid
             );
-
-            const deckDoc = await getDoc(doc(decksCollectionRef, deckId));
-
-            if (deckDoc.exists()) {
-                const deckData = deckDoc.data();
-                const currentUser = auth.currentUser;
-
-                if (!currentUser) {
-                    console.log("User not authenticated");
-                    return;
-                }
-
-                const isLikedByUser = Array.isArray(deckData.accessUser) &&
-                    deckData.accessUser.some((user) => user.userId === currentUser.uid);
-
-                const deckRef = doc(decksCollectionRef, deckId);
-
-                let updatedAccessUser;
-                if (isLikedByUser) {
-                    updatedAccessUser = deckData.accessUser.filter(
-                        (user) => user.userId !== currentUser.uid
-                    );
-                } else {
-                    updatedAccessUser = [
-                        ...deckData.accessUser,
-                        { userId: currentUser.uid },
-                    ];
-                }
-
-                await updateDoc(deckRef, { accessUser: updatedAccessUser });
-            }
+          } else {
+            updatedAccessUser = [
+              ...deckData.accessUser,
+              { userId: currentUser.uid },
+            ];
+          }
+  
+          await updateDoc(deckRef, { accessUser: updatedAccessUser });
         }
-
-        fetchLanguagesAndDecksFromFirebase();
+      }
+  
+      fetchLanguagesAndDecksFromFirebase();
     } catch (error) {
-        console.error("Error handling like:", error);
+      console.error('Error handling like:', error);
     }
-}
-
+  }
+  
   useEffect(() => {
     fetchLanguagesAndDecksFromFirebase();
   }, []);
@@ -203,7 +270,10 @@ const Deck = () => {
               {deck.name}
             </Link>
             <button
-              onClick={() => handleLike(deck.id)}
+              onClick={() => {
+                addLanguageAndDeckToUser(language.id, deck.id)
+                handleLike(deck.id)}             
+              } 
               className={`px-4 py-2 rounded-full font-semibold ${
                 deck.isLikedByUser ? "bg-red-500 text-white" : "bg-gray-200 text-gray-700"
               } hover:bg-opacity-80 transition-colors duration-300 flex items-center space-x-2`}
