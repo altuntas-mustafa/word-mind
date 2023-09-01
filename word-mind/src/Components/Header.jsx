@@ -19,7 +19,7 @@ export default function Header() {
   }, []);
 
   return (
-    <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 border-b border-gray-400 p-6">
+    <div className="bg-gradient-to-r from-blue-800 via-blue-500 to-green-500 border-b border-gray-400 p-6">
       <div className="container mx-auto px-4 flex items-center justify-between">
         <a href="/" className="text-4xl font-eater  whitespace-nowrap text-white hover:text-yellow-300 ">
           Word-Mind

@@ -109,7 +109,7 @@ const Flashcards = () => {
       <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex space-x-4 mt-4 font-abel">
         {!isFlipped ? (
           <button
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-35"
+            className="text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 min-w-24 min-h-10 text-center mr-2 mb-2"
             onClick={handleFlip}
           >
             Flip
@@ -123,7 +123,7 @@ const Flashcards = () => {
           </Link>
         ) : (
           <button
-            className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-35"
+            className="text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 min-w-24 min-h-10 text-center mr-2 mb-2"
             onClick={handleNextCard}
           >
             Next Card
