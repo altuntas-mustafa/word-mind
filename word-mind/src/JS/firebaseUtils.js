@@ -10,10 +10,16 @@ import {
   getDoc,
   deleteDoc,
 } from "firebase/firestore";
-import { auth,db } from "../firebase/firebase";
+import { auth, db } from "../firebase/firebase";
 
-
-export const handleSubmit = async (deckInfo, user, setIsErrorPopupVisible, setIsSuccessPopupVisible, setErrorMessage, setDeckInfo) => {
+export const handleSubmit = async (
+  deckInfo,
+  user,
+  setIsErrorPopupVisible,
+  setIsSuccessPopupVisible,
+  setErrorMessage,
+  setDeckInfo
+) => {
   if (!deckInfo.deckName || !deckInfo.language) {
     setErrorMessage("Please fill out the deck name and language fields.");
     setIsErrorPopupVisible(true);
@@ -21,11 +27,12 @@ export const handleSubmit = async (deckInfo, user, setIsErrorPopupVisible, setIs
   }
   if (
     deckInfo.cards.some(
-      (card) =>
-        (card.front.trim() + "" + card.back.trim()).split("").length < 2
+      (card) => (card.front.trim() + "" + card.back.trim()).split("").length < 2
     )
-  ){
-    setErrorMessage("Each card should have at least 2 total words (front and back combined).");
+  ) {
+    setErrorMessage(
+      "Each card should have at least 2 total words (front and back combined)."
+    );
     setIsErrorPopupVisible(true);
     return;
   }
@@ -48,7 +55,9 @@ export const handleSubmit = async (deckInfo, user, setIsErrorPopupVisible, setIs
     const deckQuerySnapshot = await getDocs(deckQuery);
 
     if (!deckQuerySnapshot.empty) {
-      setErrorMessage("A deck with the same name already exists. Please choose a different deck name.");
+      setErrorMessage(
+        "A deck with the same name already exists. Please choose a different deck name."
+      );
       setIsErrorPopupVisible(true);
       return;
     }
@@ -58,17 +67,20 @@ export const handleSubmit = async (deckInfo, user, setIsErrorPopupVisible, setIs
     await setDoc(deckDocRef, {
       name: deckInfo.deckName,
       creatorUser: user.id,
-      accessUser: [{ userId: user.id }],
     });
 
     const flashcardsCollectionRef = collection(deckDocRef, "flashcards");
-    await Promise.all(deckInfo.cards.map(async (card) => {
-      await addDoc(flashcardsCollectionRef, {
-        front: card.front,
-        back: card.back,
-      });
-    }));
+    await Promise.all(
+      deckInfo.cards.map(async (card) => {
+        await addDoc(flashcardsCollectionRef, {
+          front: card.front,
+          back: card.back,
+        });
+      })
+    );
 
+    // Call addLanguageDeckAndHandleLike to add the deck to the user's collection
+    await addLanguageDeckAndHandleLike(deckInfo.language, deckInfo.deckName);
     setIsSuccessPopupVisible(true);
 
     setDeckInfo({
@@ -83,48 +95,6 @@ export const handleSubmit = async (deckInfo, user, setIsErrorPopupVisible, setIs
     console.error("Error creating deck:", error);
   }
 };
-
-
-export async function fetchLanguagesAndDecksFromFirebase(setLanguages) {
-  const languagesCollectionRef = collection(db, "languages");
-
-  try {
-    const languagesQuerySnapshot = await getDocs(languagesCollectionRef);
-    const languagesData = [];
-
-    for (const languageDoc of languagesQuerySnapshot.docs) {
-      const languageId = languageDoc.id;
-      const languageData = {
-        id: languageId,
-        decks: [],
-      };
-      const decksCollectionRef = collection(db, `languages/${languageId}/decks`);
-      const decksQuerySnapshot = await getDocs(decksCollectionRef);
-
-      for (const deckDoc of decksQuerySnapshot.docs) {
-        const deckId = deckDoc.id;
-        const deckData = deckDoc.data();
-        const currentUser = auth.currentUser;
-        const isLikedByUser =
-          currentUser &&
-          Array.isArray(deckData.accessUser) &&
-          deckData.accessUser.some((user) => user.userId === currentUser.uid);
-
-        languageData.decks.push({
-          id: deckId,
-          isLikedByUser: isLikedByUser || false,
-          ...deckData,
-        });
-      }
-
-      languagesData.push(languageData);
-    }
-
-    setLanguages(languagesData);
-  } catch (error) {
-    console.error("Error fetching languages and decks:", error);
-  }
-}
 
 export async function addLanguageDeckAndHandleLike(languageId, deckId) {
   const currentUser = auth.currentUser;
@@ -156,12 +126,17 @@ export async function addLanguageDeckAndHandleLike(languageId, deckId) {
         "decks"
       );
       const userDeckDoc = doc(userDeckCollection, deckId);
+      console.log("data", flashcardsQuerySnapshot.docs);
       const flashcardsData = flashcardsQuerySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
 
-      await setDoc(userDeckDoc, { flashcards: flashcardsData }, { merge: true });
+      await setDoc(
+        userDeckDoc,
+        { flashcards: flashcardsData },
+        { merge: true }
+      );
 
       const deckData = deckDocSnapshot.data();
       const isLikedByUser =
@@ -190,5 +165,49 @@ export async function addLanguageDeckAndHandleLike(languageId, deckId) {
     // fetchLanguagesAndDecksFromFirebase(setLanguages); // You may need to define this function
   } catch (error) {
     console.error("Error adding language, deck, and handling like:", error);
+  }
+}
+
+export async function fetchLanguagesAndDecksFromFirebase(setLanguages) {
+  const languagesCollectionRef = collection(db, "languages");
+
+  try {
+    const languagesQuerySnapshot = await getDocs(languagesCollectionRef);
+    const languagesData = [];
+
+    for (const languageDoc of languagesQuerySnapshot.docs) {
+      const languageId = languageDoc.id;
+      const languageData = {
+        id: languageId,
+        decks: [],
+      };
+      const decksCollectionRef = collection(
+        db,
+        `languages/${languageId}/decks`
+      );
+      const decksQuerySnapshot = await getDocs(decksCollectionRef);
+
+      for (const deckDoc of decksQuerySnapshot.docs) {
+        const deckId = deckDoc.id;
+        const deckData = deckDoc.data();
+        const currentUser = auth.currentUser;
+        const isLikedByUser =
+          currentUser &&
+          Array.isArray(deckData.accessUser) &&
+          deckData.accessUser.some((user) => user.userId === currentUser.uid);
+
+        languageData.decks.push({
+          id: deckId,
+          isLikedByUser: isLikedByUser || false,
+          ...deckData,
+        });
+      }
+
+      languagesData.push(languageData);
+    }
+
+    setLanguages(languagesData);
+  } catch (error) {
+    console.error("Error fetching languages and decks:", error);
   }
 }
