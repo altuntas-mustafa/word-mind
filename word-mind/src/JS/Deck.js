@@ -87,14 +87,19 @@ const Deck = () => {
       const deckCollectionRef = collection(languageDocRef, 'decks');
       const deckDocRef = doc(deckCollectionRef, deckId);
       const deckDocSnapshot = await getDoc(deckDocRef);
-  
-      if (deckDocSnapshot.exists()) {
+
+      if (deckDocRef.exists()) {
         const deckInfo = deckDocSnapshot.data();
-        const userDocRef = doc(db, 'users', currentUser.uid);
+  
+        // Create references to collections 
+        const languagesCollection = collection(db, 'users', currentUser.uid, 'languages');
+        const languageDoc = doc(languagesCollection, languageId);
+        const decksCollection = collection(languageDoc, 'decks');
+        const deckDoc = doc(decksCollection, deckId);
   
         // Create a reference to the "flashcards" collection under the deck document
-        const flashcardsCollectionRef = collection(deckDocRef, 'flashcards');
-        const flashcardsQuerySnapshot = await getDocs(flashcardsCollectionRef);
+        const flashcardsCollection = collection(deckDoc, 'flashcards');
+        const flashcardsQuerySnapshot = await getDocs(flashcardsCollection);
   
         // Retrieve flashcard data as an array
         const flashcardsData = flashcardsQuerySnapshot.docs.map((doc) => ({
@@ -102,35 +107,11 @@ const Deck = () => {
           ...doc.data(),
         }));
   
-        // Update the user document structure with flashcard data
-        await runTransaction(db, async (transaction) => {
-          const userDocSnapshot = await transaction.get(userDocRef);
-  
-          if (userDocSnapshot.exists()) {
-            const userData = userDocSnapshot.data();
-  
-            if (!userData.languages) {
-              userData.languages = {}; // Initialize the languages object if it doesn't exist
-            }
-  
-            if (!userData.languages[languageId]) {
-              userData.languages[languageId] = {}; // Initialize the language object if it doesn't exist
-            }
-  
-            if (!userData.languages[languageId].decks) {
-              userData.languages[languageId].decks = {}; // Initialize the decks object if it doesn't exist
-            }
-  
-            // Add deck info under user.id/language/decks/deckId
-            userData.languages[languageId].decks[deckId] = deckInfo;
-  
-            // Add flashcard data under user.id/language/decks/deckId/flashcards
-            userData.languages[languageId].decks[deckId].flashcards = flashcardsData;
-  
-            // Update the user document with the new data
-            transaction.set(userDocRef, userData);
-          }
-        });
+        // Update the user document with the new data
+        await setDoc(deckDoc, {
+          flashcards: flashcardsData,
+          ...deckInfo,
+        }, { merge: true });
       }
     } catch (error) {
       console.error('Error adding language, deck, and flashcards to user:', error);
