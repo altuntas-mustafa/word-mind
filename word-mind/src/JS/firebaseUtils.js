@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "../firebase/firebase";
 
+// Function to handle form submission (create language, deck, and add to user liked decks)
 export const handleSubmit = async (
   deckInfo,
   user,
@@ -96,6 +97,37 @@ export const handleSubmit = async (
   }
 };
 
+// Function to delete a specific deck from the language collection
+export async function deleteDeck(languageId, deckId) {
+  try {
+    const deckDocCollection = collection(db, 'languages', languageId, 'decks');
+    const userDeckDoc = doc(deckDocCollection, deckId);
+
+    // Delete the deck document
+    await deleteDoc(userDeckDoc);
+
+    // Delete all flashcards in the subcollection
+    const flashcardsQuery = query(collection(userDeckDoc, 'flashcards'));
+    const flashcardsSnapshot = await getDocs(flashcardsQuery);
+
+    flashcardsSnapshot.forEach(async (doc) => {
+      await deleteDoc(doc.ref);
+    });
+
+    // Check if the 'decks' subcollection is empty
+    const decksQuery = query(collection(db, 'languages', languageId, 'decks'));
+    const decksSnapshot = await getDocs(decksQuery);
+
+    if (decksSnapshot.size === 0) {
+      // If the 'decks' subcollection is empty, delete the language document
+      const languageDoc = doc(db, 'languages', languageId);
+      await deleteDoc(languageDoc);
+    }
+  } catch (error) {
+    console.error('Error deleting deck:', error);
+  }
+}
+
 export async function addLanguageDeckAndHandleLike(languageId, deckId) {
   const currentUser = auth.currentUser;
 
@@ -126,7 +158,6 @@ export async function addLanguageDeckAndHandleLike(languageId, deckId) {
         "decks"
       );
       const userDeckDoc = doc(userDeckCollection, deckId);
-      console.log("data", flashcardsQuerySnapshot.docs);
       const flashcardsData = flashcardsQuerySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -162,7 +193,6 @@ export async function addLanguageDeckAndHandleLike(languageId, deckId) {
       console.error("Deck does not exist");
     }
 
-    // fetchLanguagesAndDecksFromFirebase(setLanguages); // You may need to define this function
   } catch (error) {
     console.error("Error adding language, deck, and handling like:", error);
   }

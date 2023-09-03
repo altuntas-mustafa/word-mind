@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import {
   fetchLanguagesAndDecksFromFirebase,
   addLanguageDeckAndHandleLike,
+  deleteDeck,
 } from "./firebaseUtils";
 import { auth } from "../firebase/firebase";
 
@@ -21,9 +22,18 @@ const Deck = () => {
     fetchLanguagesAndDecksFromFirebase(setLanguages);
   }, []); // Empty dependency array, so it runs only once on initial mount
 
-  const handleDeckClick = async (languageId, deckId) => {
+  const handleLikeClick = async (languageId, deckId) => {
     try {
       await addLanguageDeckAndHandleLike(languageId, deckId);
+      // Refetch languages and decks after successful addition/deletion
+      fetchLanguagesAndDecksFromFirebase(setLanguages);
+    } catch (error) {
+      console.error("Error while adding/deleting deck:", error);
+    }
+  };
+  const handleDeleteClick = async (languageId, deckId) => {
+    try {
+      await deleteDeck(languageId, deckId);
       // Refetch languages and decks after successful addition/deletion
       fetchLanguagesAndDecksFromFirebase(setLanguages);
     } catch (error) {
@@ -75,9 +85,7 @@ const Deck = () => {
               >
                 <div
                   className={`absolute left-1 transition-transform duration-300 ease-in-out h-1 w-4 pt-4 mt-1 bg-white rounded-full ${
-                    isFrontDisplayed
-                      ? "transform translate-x-full pt-4 mt-1"
-                      : ""
+                    isFrontDisplayed ? "transform translate-x-full pt-4 mt-1" : ""
                   }`}
                 ></div>
               </div>
@@ -85,7 +93,7 @@ const Deck = () => {
             </label>
           </div>
         </div>
-
+  
         <div className="space-y-6 ml-4 sm:ml-10">
           {languages.map((language) => (
             <div
@@ -106,46 +114,71 @@ const Deck = () => {
                     >
                       {deck.name}
                     </Link>
-                    {auth.currentUser ? ( 
-  <button
-    onClick={() => {
-      try {
-        handleDeckClick(language.id, deck.id);
-      } catch (error) {
-        console.error("Error while adding/deleting deck:", error);
-      }
-    }}
-    className={`px-4 py-2 rounded-full font-semibold ${
-      deck.isLikedByUser
-        ? "bg-green-400 text-white"
-        : "bg-gray-200 text-gray-700"
-    } hover:bg-opacity-80 transition-colors duration-300 flex items-center space-x-2`}
-  >
-    {deck.isLikedByUser ? (
-      <>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          height="1em"
-          viewBox="0 0 448 512"
-        >
-          <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z" />
-        </svg>
-        <div>Added</div>
-      </>
-    ) : (
-      <>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          height="1em"
-          viewBox="0 0 512 512"
-        >
-          <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0-14 10.7 24-24s24 10.7 24 24H280v64c0 13.3-10.7 24-24 24s-14-10.7 24-24z" />
-        </svg>
-        <div>Add</div>
-      </>
-    )}
-  </button>
-) : null} 
+                    {auth.currentUser ? (
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => {
+                            try {
+                              handleLikeClick(language.id, deck.id);
+                            } catch (error) {
+                              console.error(
+                                "Error while adding/deleting deck:",
+                                error
+                              );
+                            }
+                          }}
+                          className={`px-4 py-2 rounded-full font-semibold ${
+                            deck.isLikedByUser
+                              ? "bg-green-400 text-white"
+                              : "bg-gray-200 text-gray-700"
+                          } hover:bg-opacity-80 transition-colors duration-300 flex items-center space-x-2`}
+                        >
+                          {deck.isLikedByUser ? (
+                            <>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                height="1em"
+                                viewBox="0 0 448 512"
+                              >
+                                <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z" />
+                              </svg>
+                              <div>Added</div>
+                            </>
+                          ) : (
+                            <>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                height="1em"
+                                viewBox="0 0 512 512"
+                              >
+                                <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0-14 10.7 24-24s24 10.7 24 24H280v64c0-13.3-10.7-24-24-24s-14-10.7 24-24z" />
+                              </svg>
+                              <div>Add</div>
+                            </>
+                          )}
+                        </button>
+                        {deck.creatorUser === auth.currentUser.uid ? (
+                          <button
+                            onClick={() => {
+                              handleDeleteClick(language.id, deck.id)
+                            }}
+                            className="px-4 py-2 rounded-full font-semibold bg-red-500 text-white hover:bg-red-600 transition-colors duration-300 flex items-center space-x-2"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              height="1em"
+                              viewBox="0 0 448 512"
+                            >
+                              <path
+                                fill="currentColor"
+                                d="M364 24H84c-22.1 0-40 17.9-40 40v384c0 22.1 17.9 40 40 40h280c22.1 0-40-17.9-40-40V64c0-22.1-17.9-40-40-40zm-16 392c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16v224zm-64 0c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16v224zm-64 0c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16v224zm-64 0c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16v224z"
+                              ></path>
+                            </svg>
+                            <div>Delete</div>
+                          </button>
+                        ) : null}
+                      </div>
+                    ) : null}
                   </li>
                 ))}
               </ul>
@@ -155,6 +188,7 @@ const Deck = () => {
       </div>
     </div>
   );
+  
 };
 
 export default Deck;
