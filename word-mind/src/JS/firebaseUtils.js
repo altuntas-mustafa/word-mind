@@ -181,7 +181,7 @@ export async function addLanguageDeckAndHandleLike(languageId, deckId) {
 
 
 // Function to delete a specific deck from the language collection
-export async function deleteDeck(languageId, deckId) {
+export async function deleteDeckLanguageCollection(languageId, deckId) {
   try {
     const deckDocCollection = collection(db, 'languages', languageId, 'decks');
     const userDeckDoc = doc(deckDocCollection, deckId);
@@ -210,6 +210,61 @@ export async function deleteDeck(languageId, deckId) {
     console.error('Error deleting deck:', error);
   }
 }
+export async function deleteDeckUsersCollection(languageId, deckId) {
+  const currentUser = auth.currentUser;
+  try {
+    const deckDocCollection = collection(db,
+      "users",
+      currentUser.uid,
+      "languages",
+      languageId,
+      "decks"
+      );
+    const userDeckDoc = doc(deckDocCollection, deckId);
+
+    // Delete the deck document
+    await deleteDoc(userDeckDoc);
+
+    // Delete all flashcards in the subcollection
+    const flashcardsQuery = query(collection(userDeckDoc, 'flashcards'));
+    const flashcardsSnapshot = await getDocs(flashcardsQuery);
+
+    flashcardsSnapshot.forEach(async (doc) => {
+      await deleteDoc(doc.ref);
+    });
+
+    // Check if the 'decks' subcollection is empty
+    const decksQuery = query(collection(db,
+      "users",
+      currentUser.uid,
+      "languages",
+      languageId,
+      "decks"
+      ));
+    const decksSnapshot = await getDocs(decksQuery);
+    if (decksSnapshot.size === 0) {
+      try {
+        const languageDoc = doc(
+          db,
+          "users",
+          currentUser.uid,
+          "languages",
+          languageId
+        );
+      
+        await deleteDoc(languageDoc);
+        console.log(`Language '${languageId}' deleted successfully.`);
+      } catch (error) {
+        console.error("Error deleting language:", error);
+      }
+      
+    }
+    addLanguageDeckAndHandleLike(languageId, deckId)
+  } catch (error) {
+    console.error('Error deleting deck:', error);
+  }
+}
+
 
 
 export async function fetchLanguagesAndDecksFromFirebase(setLanguages) {
@@ -253,5 +308,31 @@ export async function fetchLanguagesAndDecksFromFirebase(setLanguages) {
     setLanguages(languagesData);
   } catch (error) {
     console.error("Error fetching languages and decks:", error);
+  }
+}
+
+
+
+export async function addCurrentUserToUsersCollection() {
+  const currentUser = auth.currentUser;
+
+  if (!currentUser) {
+    console.log('User not authenticated');
+    return;
+  }
+
+  const userDocRef = doc(db, 'users', currentUser.uid);
+
+  try {
+    const userDocSnapshot = await getDoc(userDocRef);
+
+    if (!userDocSnapshot.exists()) {
+      // If the document doesn't exist, create it with the user's UID
+      await setDoc(userDocRef, {
+        userId: currentUser.uid
+      });
+    }
+  } catch (error) {
+    console.error('Error adding current user to "users" collection:', error);
   }
 }

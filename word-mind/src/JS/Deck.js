@@ -5,7 +5,8 @@ import { Link } from "react-router-dom";
 import {
   fetchLanguagesAndDecksFromFirebase,
   addLanguageDeckAndHandleLike,
-  deleteDeck,
+  deleteDeckFromCollection,
+  deleteDeckLanguageCollection,
 } from "./firebaseUtils";
 import { auth } from "../firebase/firebase";
 
@@ -33,7 +34,7 @@ const Deck = () => {
   };
   const handleDeleteClick = async (languageId, deckId) => {
     try {
-      await deleteDeck(languageId, deckId);
+      await deleteDeckLanguageCollection(languageId, deckId);
       // Refetch languages and decks after successful addition/deletion
       fetchLanguagesAndDecksFromFirebase(setLanguages);
     } catch (error) {

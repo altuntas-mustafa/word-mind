@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { UserInfo } from '../JS/UserInfo';
 import Login from './Login';
-import { collection, getDocs, getDoc, doc, setDoc } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebase';
 import { Link } from 'react-router-dom';
-import { deleteDeck } from '../JS/firebaseUtils';
+import { addCurrentUserToUsersCollection, deleteDeckFromCollection, deleteDeckUsersCollection } from '../JS/firebaseUtils';
 
 const Dashboard = () => {
   const user = useSelector(state => state.user);
@@ -24,29 +24,7 @@ const Dashboard = () => {
     fetchUserInfoAsync();
   }, [dispatch,user]);
 
-  async function addCurrentUserToUsersCollection() {
-    const currentUser = auth.currentUser;
-
-    if (!currentUser) {
-      console.log('User not authenticated');
-      return;
-    }
-
-    const userDocRef = doc(db, 'users', currentUser.uid);
-
-    try {
-      const userDocSnapshot = await getDoc(userDocRef);
-
-      if (!userDocSnapshot.exists()) {
-        // If the document doesn't exist, create it with the user's UID
-        await setDoc(userDocRef, {
-          userId: currentUser.uid
-        });
-      }
-    } catch (error) {
-      console.error('Error adding current user to "users" collection:', error);
-    }
-  }
+  addCurrentUserToUsersCollection();
 
   async function fetchUserLikedDecks() {
     try {
@@ -94,7 +72,7 @@ const Dashboard = () => {
   }
   const handleDeleteClick = async (languageId, deckId) => {
     try {
-      await deleteDeck(languageId, deckId);
+      await deleteDeckUsersCollection(languageId, deckId);
       // Refetch languages and decks after successful addition/deletion
       fetchUserLikedDecks()
     } catch (error) {
