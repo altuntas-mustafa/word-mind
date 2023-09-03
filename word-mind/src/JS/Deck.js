@@ -1,18 +1,11 @@
 import React, { useState, useEffect } from "react";
-import {
-  collection,
-  getDocs,
-  doc,
-  updateDoc,
-  getDoc,
-  setDoc,
-  runTransaction,
-  deleteDoc,
-} from "firebase/firestore";
-import { auth, db } from "../firebase/firebase";
-import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setOrder, setDisplayOrder } from "../redux/reducers/reducers";
+import { Link } from "react-router-dom";
+import {
+  fetchLanguagesAndDecksFromFirebase,
+  addLanguageDeckAndHandleLike,
+} from "./firebaseUtils";
 
 const Deck = () => {
   const [languages, setLanguages] = useState([]);
@@ -23,139 +16,19 @@ const Deck = () => {
     (state) => state.flashcards.isFrontDisplayed
   );
 
-  async function fetchLanguagesAndDecksFromFirebase() {
-    const languagesCollectionRef = collection(db, "languages");
-
-    try {
-      const languagesQuerySnapshot = await getDocs(languagesCollectionRef);
-      const languagesData = [];
-
-      for (const languageDoc of languagesQuerySnapshot.docs) {
-        const languageId = languageDoc.id;
-
-        const languageData = {
-          id: languageId,
-          decks: [],
-        };
-
-        const decksCollectionRef = collection(
-          db,
-          `languages/${languageId}/decks`
-        );
-        const decksQuerySnapshot = await getDocs(decksCollectionRef);
-
-        for (const deckDoc of decksQuerySnapshot.docs) {
-          const deckId = deckDoc.id;
-          const deckData = deckDoc.data();
-          if (auth.currentUser) {
-            const currentUser = auth.currentUser;
-            // Check if the current user has liked the deck
-            const isLikedByUser =
-              Array.isArray(deckData.accessUser) &&
-              deckData.accessUser.some(
-                (user) => user.userId === currentUser.uid
-              );
-
-            languageData.decks.push({
-              id: deckId,
-              isLikedByUser: isLikedByUser,
-              ...deckData,
-            });
-          } else {
-            languageData.decks.push({
-              id: deckId,
-              ...deckData,
-            });
-          }
-        }
-
-        languagesData.push(languageData);
-      }
-
-      setLanguages(languagesData);
-    } catch (error) {
-      console.error("Error fetching languages and decks:", error);
-    }
-  }
-
-
-
-  async function addLanguageDeckAndHandleLike(languageId, deckId) {
-    const currentUser = auth.currentUser;
-  
-    if (!currentUser) {
-      console.log("User not authenticated");
-      return;
-    }
-  
-    try {
-      // Fetch the deck info from the languages collection
-      const languagesCollectionRef = collection(db, "languages");
-      const languageDocRef = doc(languagesCollectionRef, languageId);
-      const deckCollectionRef = collection(languageDocRef, "decks");
-      const deckDocRef = doc(deckCollectionRef, deckId);
-      const deckDocSnapshot = await getDoc(deckDocRef);
-  
-      if (deckDocSnapshot.exists()) {
-        // Fetch the flashcard data from the deck
-        const flashcardsCollectionRef = collection(deckDocRef, "flashcards");
-        const flashcardsQuerySnapshot = await getDocs(flashcardsCollectionRef);
-
-        // Create references to collections
-        const userLanguageCollection = collection(db, "users", currentUser.uid, "languages");
-        const userDeckCollection = collection(userLanguageCollection, languageId, "decks");
-        const userDeckDoc = doc(userDeckCollection, deckId);
-  
-        // Retrieve flashcard data as an array
-        const flashcardsData = flashcardsQuerySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-  
-        // Update the user document with the new data
-        await setDoc(userDeckDoc, { flashcards: flashcardsData }, { merge: true });
-  
-        // Handle like functionality
-        const deckData = deckDocSnapshot.data();
-  
-        const isLikedByUser =
-          Array.isArray(deckData.accessUser) &&
-          deckData.accessUser.some((user) => user.userId === currentUser.uid);
-  
-        const deckRef = doc(deckCollectionRef, deckId);
-  
-        let updatedAccessUser;
-        if (isLikedByUser) {
-          // Remove the user from the accessUser array
-          updatedAccessUser = deckData.accessUser.filter(
-            (user) => user.userId !== currentUser.uid
-          );
-  
-          // Also remove the deck from the user's collection
-          await deleteDoc(userDeckDoc);
-        } else {
-          // Add the user to the accessUser array
-          updatedAccessUser = [
-            ...deckData.accessUser,
-            { userId: currentUser.uid },
-          ];
-        }
-  
-        await updateDoc(deckRef, { accessUser: updatedAccessUser });
-      } else {
-        console.error("Deck does not exist");
-      }
-  
-      fetchLanguagesAndDecksFromFirebase(); // You may need to define this function
-    } catch (error) {
-      console.error("Error adding language, deck, and handling like:", error);
-    }
-  }
-  
-
   useEffect(() => {
-    fetchLanguagesAndDecksFromFirebase();
-  }, []);
+    fetchLanguagesAndDecksFromFirebase(setLanguages);
+  }, []); // Empty dependency array, so it runs only once on initial mount
+
+  const handleDeckClick = async (languageId, deckId) => {
+    try {
+      await addLanguageDeckAndHandleLike(languageId, deckId);
+      // Refetch languages and decks after successful addition/deletion
+      fetchLanguagesAndDecksFromFirebase(setLanguages);
+    } catch (error) {
+      console.error("Error while adding/deleting deck:", error);
+    }
+  };
 
   return (
     <div className="p-5 min-h-screen  flex justify-center ">
@@ -234,7 +107,14 @@ const Deck = () => {
                     </Link>
                     <button
                       onClick={() => {
-                        addLanguageDeckAndHandleLike(language.id, deck.id)
+                        try {
+                          handleDeckClick(language.id, deck.id);
+                        } catch (error) {
+                          console.error(
+                            "Error while adding/deleting deck:",
+                            error
+                          );
+                        }
                       }}
                       className={`px-4 py-2 rounded-full font-semibold ${
                         deck.isLikedByUser

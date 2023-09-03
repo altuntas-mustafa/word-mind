@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // import { setUser } from '../redux/reducers/user';
 import Popup from './Popup';
-import { handleSubmit } from './createDeckAndLanguage';
+import { handleSubmit } from './firebaseUtils';
 import { UserInfo } from './UserInfo'; // Import the user utility function
 
 const AddDeck = () => {
