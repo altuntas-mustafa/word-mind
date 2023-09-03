@@ -75,7 +75,7 @@ const AddDeck = () => {
   return (
     <>
     <div className="p-5 min-h-screen  flex justify-center bg-gray-300 ">
-      <div className="flex flex-col items-center space-y-6 p-6 bg-gray-100 rounded-lg shadow-md h-screen font-abel">
+      <div className="flex flex-col items-center space-y-6 p-6 bg-gray-100 rounded-lg shadow-md h-screen  w-full md:w-1/2 lg:w-1/3 font-abel">
         <h1 className="text-4xl  mb-2 flex justify-center items-center font-abel">CREATE NEW DECK</h1>
         <nav className="flex space-x-4">
           <div

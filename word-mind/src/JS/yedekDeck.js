@@ -77,60 +77,62 @@ const Deck = () => {
     }
   }
 
+  async function addLanguageAndDeckToUser(languageId, deckId) {
+    const currentUser = auth.currentUser;
 
-async function addLanguageAndDeckToUser(languageId, deckId) {
-  const currentUser = auth.currentUser;
-
-  if (!currentUser) {
-    console.log("User not authenticated");
-    return;
-  }
-
-  try {
-    // Create references to user's collections
-    const userLanguagesCollection = collection(db, "users", currentUser.uid, "languages");
-    const userLanguageDoc = doc(userLanguagesCollection, languageId);
-    const userLanguageDocSnapshot = await getDoc(userLanguageDoc);
-
-    if (!userLanguageDocSnapshot.exists()) {
-      // If the language doesn't exist for the user, create it
-      await setDoc(userLanguageDoc, { name: languageId });
+    if (!currentUser) {
+      console.log("User not authenticated");
+      return;
     }
 
-    // Fetch the deck info from the languages collection
-    const languagesCollectionRef = collection(db, "languages");
-    const languageDocRef = doc(languagesCollectionRef, languageId);
-    const deckCollectionRef = collection(languageDocRef, "decks");
-    const deckDocRef = doc(deckCollectionRef, deckId);
-    const deckDocSnapshot = await getDoc(deckDocRef);
+    try {
+      // Fetch the deck info from the languages collection
+      const languagesCollectionRef = collection(db, "languages");
+      const languageDocRef = doc(languagesCollectionRef, languageId);
+      const deckCollectionRef = collection(languageDocRef, "decks");
+      const deckDocRef = doc(deckCollectionRef, deckId);
+      const deckDocSnapshot = await getDoc(deckDocRef);
 
-    if (deckDocSnapshot.exists()) {
-      // Fetch the flashcard data from the deck
-      const flashcardsCollectionRef = collection(deckDocRef, "flashcards");
-      const flashcardsQuerySnapshot = await getDocs(flashcardsCollectionRef);
-      console.log(flashcardsQuerySnapshot.docs);
-      
-      // Create references to collections
-      const userLanguageCollection = collection(db, "users", currentUser.uid, "languages");
-      const userDeckCollection = collection(userLanguageCollection, languageId, "decks");
-      const userDeckDoc = doc(userDeckCollection, deckId);
+      if (deckDocSnapshot.exists()) {
+        // Fetch the flashcard data from the deck
+        const flashcardsCollectionRef = collection(deckDocRef, "flashcards");
+        const flashcardsQuerySnapshot = await getDocs(flashcardsCollectionRef);
+        console.log(flashcardsQuerySnapshot.docs);
+        // Create references to collections
+        const languagesCollection = collection(
+          db,
+          "users",
+          currentUser.uid,
+          "languages"
+        );
+        const languageDoc = doc(languagesCollection, languageId);
+        const decksCollection = collection(languageDoc, "decks");
+        const deckDoc = doc(decksCollection, deckId);
 
-      // Retrieve flashcard data as an array
-      const flashcardsData = flashcardsQuerySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
 
-      // Update the user document with the new data
-      await setDoc(userDeckDoc, { flashcards: flashcardsData }, { merge: true });
-    } else {
-      console.error("Deck does not exist");
+
+        // Retrieve flashcard data as an array
+        const flashcardsData = flashcardsQuerySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        // Update the user document with the new data
+        await setDoc(  
+          deckDoc,
+          {
+            flashcards: flashcardsData,
+          },
+          { merge: true }
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Error adding language, deck, and flashcards to user:",
+        error
+      );
     }
-  } catch (error) {
-    console.error("Error adding language, deck, and flashcards to user:", error);
   }
-}
-
 
   async function handleLike(deckId) {
     try {
