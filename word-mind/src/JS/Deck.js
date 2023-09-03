@@ -6,6 +6,7 @@ import {
   fetchLanguagesAndDecksFromFirebase,
   addLanguageDeckAndHandleLike,
 } from "./firebaseUtils";
+import { auth } from "../firebase/firebase";
 
 const Deck = () => {
   const [languages, setLanguages] = useState([]);
@@ -105,47 +106,46 @@ const Deck = () => {
                     >
                       {deck.name}
                     </Link>
-                    <button
-                      onClick={() => {
-                        try {
-                          handleDeckClick(language.id, deck.id);
-                        } catch (error) {
-                          console.error(
-                            "Error while adding/deleting deck:",
-                            error
-                          );
-                        }
-                      }}
-                      className={`px-4 py-2 rounded-full font-semibold ${
-                        deck.isLikedByUser
-                          ? "bg-green-400 text-white"
-                          : "bg-gray-200 text-gray-700"
-                      } hover:bg-opacity-80 transition-colors duration-300 flex items-center space-x-2`}
-                    >
-                      {deck.isLikedByUser ? (
-                        <>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            height="1em"
-                            viewBox="0 0 448 512"
-                          >
-                            <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z" />
-                          </svg>
-                          <div>Added</div>
-                        </>
-                      ) : (
-                        <>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            height="1em"
-                            viewBox="0 0 512 512"
-                          >
-                            <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H280v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z" />
-                          </svg>
-                          <div>Add</div>
-                        </>
-                      )}
-                    </button>
+                    {auth.currentUser ? ( 
+  <button
+    onClick={() => {
+      try {
+        handleDeckClick(language.id, deck.id);
+      } catch (error) {
+        console.error("Error while adding/deleting deck:", error);
+      }
+    }}
+    className={`px-4 py-2 rounded-full font-semibold ${
+      deck.isLikedByUser
+        ? "bg-green-400 text-white"
+        : "bg-gray-200 text-gray-700"
+    } hover:bg-opacity-80 transition-colors duration-300 flex items-center space-x-2`}
+  >
+    {deck.isLikedByUser ? (
+      <>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="1em"
+          viewBox="0 0 448 512"
+        >
+          <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z" />
+        </svg>
+        <div>Added</div>
+      </>
+    ) : (
+      <>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="1em"
+          viewBox="0 0 512 512"
+        >
+          <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0-14 10.7 24-24s24 10.7 24 24H280v64c0 13.3-10.7 24-24 24s-14-10.7 24-24z" />
+        </svg>
+        <div>Add</div>
+      </>
+    )}
+  </button>
+) : null} 
                   </li>
                 ))}
               </ul>
