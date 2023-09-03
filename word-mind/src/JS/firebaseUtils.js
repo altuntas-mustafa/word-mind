@@ -180,91 +180,134 @@ export async function addLanguageDeckAndHandleLike(languageId, deckId) {
 }
 
 
-// Function to delete a specific deck from the language collection
-export async function deleteDeckLanguageCollection(languageId, deckId) {
-  try {
-    const deckDocCollection = collection(db, 'languages', languageId, 'decks');
-    const userDeckDoc = doc(deckDocCollection, deckId);
+// // Function to delete a specific deck from the language collection
+// export async function deleteDeckLanguageCollection(languageId, deckId) {
+//   try {
+//     const deckDocCollection = collection(db, 'languages', languageId, 'decks');
+//     const userDeckDoc = doc(deckDocCollection, deckId);
 
-    // Delete the deck document
-    await deleteDoc(userDeckDoc);
+//     // Delete the deck document
+//     await deleteDoc(userDeckDoc);
 
-    // Delete all flashcards in the subcollection
-    const flashcardsQuery = query(collection(userDeckDoc, 'flashcards'));
-    const flashcardsSnapshot = await getDocs(flashcardsQuery);
+//     // Delete all flashcards in the subcollection
+//     const flashcardsQuery = query(collection(userDeckDoc, 'flashcards'));
+//     const flashcardsSnapshot = await getDocs(flashcardsQuery);
 
-    flashcardsSnapshot.forEach(async (doc) => {
-      await deleteDoc(doc.ref);
-    });
+//     flashcardsSnapshot.forEach(async (doc) => {
+//       await deleteDoc(doc.ref);
+//     });
 
-    // Check if the 'decks' subcollection is empty
-    const decksQuery = query(collection(db, 'languages', languageId, 'decks'));
-    const decksSnapshot = await getDocs(decksQuery);
+//     // Check if the 'decks' subcollection is empty
+//     const decksQuery = query(collection(db, 'languages', languageId, 'decks'));
+//     const decksSnapshot = await getDocs(decksQuery);
 
-    if (decksSnapshot.size === 0) {
-      // If the 'decks' subcollection is empty, delete the language document
-      const languageDoc = doc(db, 'languages', languageId);
-      await deleteDoc(languageDoc);
-    }
-  } catch (error) {
-    console.error('Error deleting deck:', error);
-  }
-}
-export async function deleteDeckUsersCollection(languageId, deckId) {
-  const currentUser = auth.currentUser;
-  try {
-    const deckDocCollection = collection(db,
-      "users",
-      currentUser.uid,
-      "languages",
-      languageId,
-      "decks"
-      );
-    const userDeckDoc = doc(deckDocCollection, deckId);
+//     if (decksSnapshot.size === 0) {
+//       // If the 'decks' subcollection is empty, delete the language document
+//       const languageDoc = doc(db, 'languages', languageId);
+//       await deleteDoc(languageDoc);
+//     }
+//   } catch (error) {
+//     console.error('Error deleting deck:', error);
+//   }
+// }
+// export async function deleteDeckUsersCollection(languageId, deckId) {
+//   const currentUser = auth.currentUser;
+//   try {
+//     const deckDocCollection = collection(db,
+//       "users",
+//       currentUser.uid,
+//       "languages",
+//       languageId,
+//       "decks"
+//       );
+//     const userDeckDoc = doc(deckDocCollection, deckId);
 
-    // Delete the deck document
-    await deleteDoc(userDeckDoc);
+//     // Delete the deck document
+//     await deleteDoc(userDeckDoc);
 
-    // Delete all flashcards in the subcollection
-    const flashcardsQuery = query(collection(userDeckDoc, 'flashcards'));
-    const flashcardsSnapshot = await getDocs(flashcardsQuery);
+//     // Delete all flashcards in the subcollection
+//     const flashcardsQuery = query(collection(userDeckDoc, 'flashcards'));
+//     const flashcardsSnapshot = await getDocs(flashcardsQuery);
 
-    flashcardsSnapshot.forEach(async (doc) => {
-      await deleteDoc(doc.ref);
-    });
+//     flashcardsSnapshot.forEach(async (doc) => {
+//       await deleteDoc(doc.ref);
+//     });
 
-    // Check if the 'decks' subcollection is empty
-    const decksQuery = query(collection(db,
-      "users",
-      currentUser.uid,
-      "languages",
-      languageId,
-      "decks"
-      ));
-    const decksSnapshot = await getDocs(decksQuery);
-    if (decksSnapshot.size === 0) {
-      try {
-        const languageDoc = doc(
-          db,
-          "users",
-          currentUser.uid,
-          "languages",
-          languageId
-        );
+//     // Check if the 'decks' subcollection is empty
+//     const decksQuery = query(collection(db,
+//       "users",
+//       currentUser.uid,
+//       "languages",
+//       languageId,
+//       "decks"
+//       ));
+//     const decksSnapshot = await getDocs(decksQuery);
+//     if (decksSnapshot.size === 0) {
+//       try {
+//         const languageDoc = doc(
+//           db,
+//           "users",
+//           currentUser.uid,
+//           "languages",
+//           languageId
+//         );
       
+//         await deleteDoc(languageDoc);
+//       } catch (error) {
+//         console.error("Error deleting language:", error);
+//       }
+      
+//     }
+//     addLanguageDeckAndHandleLike(languageId, deckId)
+//   } catch (error) {
+//     console.error('Error deleting deck:', error);
+//   }
+// }
+
+export async function deleteDeckFromCollection(languageId, deckId, isUserCollection = false) {
+  try {
+    const currentUser = auth.currentUser;
+    const collectionPath = isUserCollection
+      ? `users/${currentUser.uid}/languages/${languageId}/decks`
+      : `languages/${languageId}/decks`;
+
+    const deckDocCollection = collection(db, collectionPath);
+    const userDeckDoc = doc(deckDocCollection, deckId);
+
+    // Delete the deck document
+    await deleteDoc(userDeckDoc);
+
+    // Delete all flashcards in the subcollection
+    const flashcardsQuery = query(collection(userDeckDoc, 'flashcards'));
+    const flashcardsSnapshot = await getDocs(flashcardsQuery);
+
+    flashcardsSnapshot.forEach(async (doc) => {
+      await deleteDoc(doc.ref);
+    });
+
+    // Check if the 'decks' subcollection is empty
+    const decksQuery = query(collection(db, collectionPath));
+    const decksSnapshot = await getDocs(decksQuery);
+
+    if (decksSnapshot.size === 0) {
+      const languageDocPath = isUserCollection
+        ? `users/${currentUser.uid}/languages/${languageId}`
+        : `languages/${languageId}`;
+      
+      try {
+        const languageDoc = doc(db, languageDocPath);
         await deleteDoc(languageDoc);
-        console.log(`Language '${languageId}' deleted successfully.`);
       } catch (error) {
         console.error("Error deleting language:", error);
       }
-      
     }
-    addLanguageDeckAndHandleLike(languageId, deckId)
+    if(isUserCollection){
+      addLanguageDeckAndHandleLike(languageId, deckId);
+    }
   } catch (error) {
     console.error('Error deleting deck:', error);
   }
 }
-
 
 
 export async function fetchLanguagesAndDecksFromFirebase(setLanguages) {
@@ -317,7 +360,7 @@ export async function addCurrentUserToUsersCollection() {
   const currentUser = auth.currentUser;
 
   if (!currentUser) {
-    console.log('User not authenticated');
+    // console.log('User not authenticated');
     return;
   }
 

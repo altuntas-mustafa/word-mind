@@ -5,7 +5,7 @@ import Login from './Login';
 import { collection, getDocs } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebase';
 import { Link } from 'react-router-dom';
-import { addCurrentUserToUsersCollection, deleteDeckFromCollection, deleteDeckUsersCollection } from '../JS/firebaseUtils';
+import { addCurrentUserToUsersCollection, deleteDeckFromCollection } from '../JS/firebaseUtils';
 
 const Dashboard = () => {
   const user = useSelector(state => state.user);
@@ -28,51 +28,54 @@ const Dashboard = () => {
 
   async function fetchUserLikedDecks() {
     try {
-      const languagesCollectionRef = collection(db, 'languages');
-      const languagesQuerySnapshot = await getDocs(languagesCollectionRef);
-
       const currentUser = auth.currentUser;
-
+  
       if (!currentUser) {
         console.log('User not authenticated');
         return;
       }
-
+  
+      const userLanguageCollectionRef = collection(
+        db,
+        'users',
+        currentUser.uid,
+        'languages'
+      );
+  
+      const userLanguagesQuerySnapshot = await getDocs(userLanguageCollectionRef);
+  
       const languageDataArray = [];
-
-      for (const languageDoc of languagesQuerySnapshot.docs) {
-        const languageId = languageDoc.id;
-        const decksCollectionRef = collection(db, `languages/${languageId}/decks`);
-        const decksQuerySnapshot = await getDocs(decksCollectionRef);
-
+  
+      for (const userLanguageDoc of userLanguagesQuerySnapshot.docs) {
+        const languageId = userLanguageDoc.id;
+        const userDeckCollectionRef = collection(
+          userLanguageDoc.ref,
+          'decks'
+        );
+        const userDeckQuerySnapshot = await getDocs(userDeckCollectionRef);
+  
         const userLikedDecks = [];
-
-        for (const deckDoc of decksQuerySnapshot.docs) {
-          const deckId = deckDoc.id;
-          const deckData = deckDoc.data();
-
-          const isLikedByUser =
-            Array.isArray(deckData.accessUser) &&
-            deckData.accessUser.some((user) => user.userId === currentUser.uid);
-
-          if (isLikedByUser) {
-            userLikedDecks.push({ id: deckId, ...deckData });
-          }
+  
+        for (const userDeckDoc of userDeckQuerySnapshot.docs) {
+          const deckId = userDeckDoc.id;
+          const deckData = userDeckDoc.data();
+  
+          userLikedDecks.push({ id: deckId, ...deckData });
         }
-
+  
         if (userLikedDecks.length > 0) {
           languageDataArray.push({ id: languageId, userLikedDecks });
         }
       }
-
       setLanguageData(languageDataArray);
     } catch (error) {
       console.error('Error fetching user-liked decks:', error);
     }
   }
+  
   const handleDeleteClick = async (languageId, deckId) => {
     try {
-      await deleteDeckUsersCollection(languageId, deckId);
+      await deleteDeckFromCollection(languageId, deckId, true);
       // Refetch languages and decks after successful addition/deletion
       fetchUserLikedDecks()
     } catch (error) {
@@ -97,7 +100,7 @@ const Dashboard = () => {
                       to={`/languages/${encodeURIComponent(language.id)}/decks/${encodeURIComponent(deck.name)}`}
                       className="text-blue-500 hover:underline transition duration-300 ease-in-out transform hover:scale-105 text-lg sm:text-xl"
                     >
-                      {deck.name}
+                      {deck.id}
                     </Link>
                     <button
                             onClick={() => {
@@ -115,7 +118,7 @@ const Dashboard = () => {
                                 d="M364 24H84c-22.1 0-40 17.9-40 40v384c0 22.1 17.9 40 40 40h280c22.1 0-40-17.9-40-40V64c0-22.1-17.9-40-40-40zm-16 392c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16v224zm-64 0c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16v224zm-64 0c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16v224zm-64 0c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16v224z"
                               ></path>
                             </svg>
-                            <div>Delete</div>
+                            <div>Delete From UserDB</div>
                           </button>
                   </li>
                 ))}

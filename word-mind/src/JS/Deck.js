@@ -6,7 +6,6 @@ import {
   fetchLanguagesAndDecksFromFirebase,
   addLanguageDeckAndHandleLike,
   deleteDeckFromCollection,
-  deleteDeckLanguageCollection,
 } from "./firebaseUtils";
 import { auth } from "../firebase/firebase";
 
@@ -34,7 +33,7 @@ const Deck = () => {
   };
   const handleDeleteClick = async (languageId, deckId) => {
     try {
-      await deleteDeckLanguageCollection(languageId, deckId);
+      await deleteDeckFromCollection(languageId, deckId, false);
       // Refetch languages and decks after successful addition/deletion
       fetchLanguagesAndDecksFromFirebase(setLanguages);
     } catch (error) {
@@ -175,7 +174,7 @@ const Deck = () => {
                                 d="M364 24H84c-22.1 0-40 17.9-40 40v384c0 22.1 17.9 40 40 40h280c22.1 0-40-17.9-40-40V64c0-22.1-17.9-40-40-40zm-16 392c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16v224zm-64 0c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16v224zm-64 0c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16v224zm-64 0c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16v224z"
                               ></path>
                             </svg>
-                            <div>Delete</div>
+                            <div>Delete From EveryOne</div>
                           </button>
                         ) : null}
                       </div>
