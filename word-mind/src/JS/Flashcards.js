@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import { useParams, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const Flashcards = () => {
-  const { deckName, language } = useParams();
+  const { userId,deckName, language } = useParams();
   const [shuffledFlashcards, setShuffledFlashcards] = useState([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -34,28 +34,36 @@ const Flashcards = () => {
     let isMounted = true;
 
     const fetchFlashcards = async () => {
-      const flashcardsCollectionRef = collection(
-        db,
-        `languages/${language}/decks/${deckName}/flashcards`
-      );
-      const flashcardsQuerySnapshot = await getDocs(flashcardsCollectionRef);
-      const flashcards = [];
+      const collectionPath = userId !== undefined
+      ? `users/${userId}/languages/${language}/decks`
+      : `languages/${language}/decks`;
+    
+    const flashcardsQuerySnapshot = await getDocs(
+      query(collection(db, collectionPath), where('name', '==', deckName))
+    );
+    
+    const flashcards = [];
 
-      flashcardsQuerySnapshot.forEach((flashcardDoc) => {
-        flashcards.push(flashcardDoc.data());
-      });
+    flashcardsQuerySnapshot.docs.forEach((deckDoc) => {
+      // Assuming there's only one deck with the specified name, so we take the first one
+      const deckData = deckDoc.data();
+      const flashcardsData = deckData.flashcards || [];
+      flashcards.push(...flashcardsData);
+    });
+    
+
+    
 
       const shuffledFlashcards = isRandomOrder
         ? shuffleArray(flashcards)
         : flashcards;
-
       if (isMounted) {
         setShuffledFlashcards(shuffledFlashcards);
         setCurrentCardIndex(0);
         setIsFlipped(false);
       }
+      
     };
-
     fetchFlashcards().catch((error) => {
       console.error("Error fetching flashcards:", error);
     });

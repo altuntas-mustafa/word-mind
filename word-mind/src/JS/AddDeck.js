@@ -22,7 +22,7 @@ const AddDeck = () => {
   });
 
   const [selectedOption, setSelectedOption] = useState('manual');
-  const [uploadedFile, setUploadedFile] = useState(null);
+  // const [uploadedFile, setUploadedFile] = useState(null);
 
 
   useEffect(() => {
@@ -53,7 +53,7 @@ const AddDeck = () => {
         language: jsonData.language || "",
         cards: jsonData.cards || [],
       });
-      setUploadedFile(file);
+      // setUploadedFile(file);
       setSelectedOption("manual");
     };
     reader.readAsText(file);

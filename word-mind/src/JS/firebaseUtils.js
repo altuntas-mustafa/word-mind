@@ -68,6 +68,7 @@ export const handleSubmit = async (
     await setDoc(deckDocRef, {
       name: deckInfo.deckName,
       creatorUser: user.id,
+      flashcards: deckInfo.cards
     });
 
     const flashcardsCollectionRef = collection(deckDocRef, "flashcards");
@@ -146,7 +147,10 @@ export async function addLanguageDeckAndHandleLike(languageId, deckId) {
 
       await setDoc(
         userDeckDoc,
-        { flashcards: flashcardsData },
+        { 
+          flashcards: flashcardsData,
+          name: deckId
+        },
         { merge: true }
       );
 
@@ -178,6 +182,7 @@ export async function addLanguageDeckAndHandleLike(languageId, deckId) {
     console.error("Error adding language, deck, and handling like:", error);
   }
 }
+
 
 
 export async function deleteDeckFromCollection(languageId, deckId, isUserCollection = false) {
