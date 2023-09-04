@@ -12,26 +12,29 @@ const Dashboard = () => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
   const [languageData, setLanguageData] = useState([]);
+  const [currentUser, setcurrentUser] = useState("");
 
   useEffect(() => {
     async function fetchUserInfoAsync() {
       await UserInfo(dispatch);
       await fetchUserLikedDecks();
       await addCurrentUserToUsersCollection();
+
       setIsLoading(false);
     }
 
     fetchUserInfoAsync();
-  }, [dispatch,user]);
+  }, [dispatch,user,currentUser]);
 
   addCurrentUserToUsersCollection();
 
+
   async function fetchUserLikedDecks() {
     try {
-      const currentUser = auth.currentUser;
-  
+      setcurrentUser(auth.currentUser)
+
       if (!currentUser) {
-        console.log('User not authenticated');
+        // console.log('User not authenticated');
         return;
       }
   
@@ -97,7 +100,7 @@ const Dashboard = () => {
                 {language.userLikedDecks.map((deck) => (
                   <li key={deck.id} className="flex items-center space-x-3">
                     <Link
-                      to={`/languages/${encodeURIComponent(language.id)}/decks/${encodeURIComponent(deck.id)}`}
+                      to={`/users/${encodeURIComponent(currentUser.uid)}/languages/${encodeURIComponent(language.id)}/decks/${encodeURIComponent(deck.id)}`}
                       className="text-blue-500 hover:underline transition duration-300 ease-in-out transform hover:scale-105 text-lg sm:text-xl"
                     >
                       {deck.id}

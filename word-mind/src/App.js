@@ -29,6 +29,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/logout" element={<Logout />} />
             <Route path="/languages/:language/decks/:deckName" element={<Flashcards />} />
+            <Route path="/users/:userId/languages/:language/decks/:deckName" element={<Flashcards />} />
           </Routes>
         </div>
       </Router>

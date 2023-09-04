@@ -1,280 +1,141 @@
 import React, { useState, useEffect } from "react";
-import {
-  collection,
-  getDocs,
-  doc,
-  updateDoc,
-  getDoc,
-  setDoc,
-  runTransaction,
-  deleteDoc,
-} from "firebase/firestore";
-import { auth, db } from "../firebase/firebase";
-import { Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { setOrder, setDisplayOrder } from "../redux/reducers/reducers";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../firebase/firebase";
+import { useParams, Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-const Deck = () => {
-  const [languages, setLanguages] = useState([]);
-  const dispatch = useDispatch();
+const Flashcards = () => {
+  const { userId,deckName, language } = useParams();
+  const [shuffledFlashcards, setShuffledFlashcards] = useState([]);
+  const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const [isFlipped, setIsFlipped] = useState(false);
 
   const isRandomOrder = useSelector((state) => state.flashcards.isRandomOrder);
   const isFrontDisplayed = useSelector(
     (state) => state.flashcards.isFrontDisplayed
   );
 
-  async function fetchLanguagesAndDecksFromFirebase() {
-    const languagesCollectionRef = collection(db, "languages");
+  const shuffleArray = (array) => {
+    return array.sort(() => Math.random() - 0.5);
+  };
 
-    try {
-      const languagesQuerySnapshot = await getDocs(languagesCollectionRef);
-      const languagesData = [];
+  const handleFlip = () => {
+    setIsFlipped(!isFlipped);
+  };
 
-      for (const languageDoc of languagesQuerySnapshot.docs) {
-        const languageId = languageDoc.id;
-
-        const languageData = {
-          id: languageId,
-          decks: [],
-        };
-
-        const decksCollectionRef = collection(
-          db,
-          `languages/${languageId}/decks`
-        );
-        const decksQuerySnapshot = await getDocs(decksCollectionRef);
-
-        for (const deckDoc of decksQuerySnapshot.docs) {
-          const deckId = deckDoc.id;
-          const deckData = deckDoc.data();
-          if (auth.currentUser) {
-            const currentUser = auth.currentUser;
-            // Check if the current user has liked the deck
-            const isLikedByUser =
-              Array.isArray(deckData.accessUser) &&
-              deckData.accessUser.some(
-                (user) => user.userId === currentUser.uid
-              );
-
-            languageData.decks.push({
-              id: deckId,
-              isLikedByUser: isLikedByUser,
-              ...deckData,
-            });
-          } else {
-            languageData.decks.push({
-              id: deckId,
-              ...deckData,
-            });
-          }
-        }
-
-        languagesData.push(languageData);
-      }
-
-      setLanguages(languagesData);
-    } catch (error) {
-      console.error("Error fetching languages and decks:", error);
+  const handleNextCard = () => {
+    if (currentCardIndex < shuffledFlashcards.length - 1) {
+      setCurrentCardIndex(currentCardIndex + 1);
+      setIsFlipped(false);
     }
-  }
-
-
-
-  async function addLanguageDeckAndHandleLike(languageId, deckId) {
-    const currentUser = auth.currentUser;
-  
-    if (!currentUser) {
-      console.log("User not authenticated");
-      return;
-    }
-  
-    try {
-      // Fetch the deck info from the languages collection
-      const languagesCollectionRef = collection(db, "languages");
-      const languageDocRef = doc(languagesCollectionRef, languageId);
-      const deckCollectionRef = collection(languageDocRef, "decks");
-      const deckDocRef = doc(deckCollectionRef, deckId);
-      const deckDocSnapshot = await getDoc(deckDocRef);
-  
-      if (deckDocSnapshot.exists()) {
-        // Fetch the flashcard data from the deck
-        const flashcardsCollectionRef = collection(deckDocRef, "flashcards");
-        const flashcardsQuerySnapshot = await getDocs(flashcardsCollectionRef);
-
-        // Create references to collections
-        const userLanguageCollection = collection(db, "users", currentUser.uid, "languages");
-        const userDeckCollection = collection(userLanguageCollection, languageId, "decks");
-        const userDeckDoc = doc(userDeckCollection, deckId);
-  
-        // Retrieve flashcard data as an array
-        const flashcardsData = flashcardsQuerySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-  
-        // Update the user document with the new data
-        await setDoc(userDeckDoc, { flashcards: flashcardsData }, { merge: true });
-  
-        // Handle like functionality
-        const deckData = deckDocSnapshot.data();
-  
-        const isLikedByUser =
-          Array.isArray(deckData.accessUser) &&
-          deckData.accessUser.some((user) => user.userId === currentUser.uid);
-  
-        const deckRef = doc(deckCollectionRef, deckId);
-  
-        let updatedAccessUser;
-        if (isLikedByUser) {
-          // Remove the user from the accessUser array
-          updatedAccessUser = deckData.accessUser.filter(
-            (user) => user.userId !== currentUser.uid
-          );
-  
-          // Also remove the deck from the user's collection
-          await deleteDoc(userDeckDoc);
-        } else {
-          // Add the user to the accessUser array
-          updatedAccessUser = [
-            ...deckData.accessUser,
-            { userId: currentUser.uid },
-          ];
-        }
-  
-        await updateDoc(deckRef, { accessUser: updatedAccessUser });
-      } else {
-        console.error("Deck does not exist");
-      }
-  
-      fetchLanguagesAndDecksFromFirebase(); // You may need to define this function
-    } catch (error) {
-      console.error("Error adding language, deck, and handling like:", error);
-    }
-  }
-  
+  };
 
   useEffect(() => {
-    fetchLanguagesAndDecksFromFirebase();
-  }, []);
+    let isMounted = true;
+
+    const fetchFlashcards = async () => {
+      const collectionPath = userId !== undefined
+      ? `users/${userId}/languages/${language}/decks/${deckName}/flashcards`
+      : `languages/${language}/decks/${deckName}/flashcards`;
+
+      const flashcardsCollectionRef = collection(
+        db,
+        collectionPath
+      );
+      const flashcardsQuerySnapshot = await getDocs(flashcardsCollectionRef);
+      const flashcards = [];
+
+      flashcardsQuerySnapshot.forEach((flashcardDoc) => {
+        flashcards.push(flashcardDoc.data());
+      });
+      console.log(flashcardsQuerySnapshot);
+      const shuffledFlashcards = isRandomOrder
+        ? shuffleArray(flashcards)
+        : flashcards;
+
+      if (isMounted) {
+        setShuffledFlashcards(shuffledFlashcards);
+        setCurrentCardIndex(0);
+        setIsFlipped(false);
+      }
+    };
+
+    fetchFlashcards().catch((error) => {
+      console.error("Error fetching flashcards:", error);
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [deckName, language, isRandomOrder]);
+
+  if (shuffledFlashcards.length === 0) {
+    return <div>Loading...</div>;
+  }
+
+  const currentFlashcard = shuffledFlashcards[currentCardIndex];
+  const isLastFlashcard = currentCardIndex === shuffledFlashcards.length - 1;
 
   return (
-    <div className="p-5 min-h-screen  flex justify-center ">
-      <div className=" p-3 bg-gray-100 shadow-md rounded-lg  w-full md:w-1/2 lg:w-1/3">
-        <h1 className="text-4xl  mb-4 flex justify-center items-center font-abel">
-          DECK LISTS
-        </h1>
-        <div className="flex flex-col md:flex-row md:items-center md:justify-center md:space-x-2 mb-4">
-          <div className="flex items-center mb-2 md:mb-0">
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input
-                type="checkbox"
-                className="hidden toggle-checkbox"
-                checked={isRandomOrder}
-                onChange={() => dispatch(setOrder(!isRandomOrder))}
-              />
-              <div
-                className={`relative w-10 h-6 bg-gray-300 rounded-full transition-colors ${
-                  isRandomOrder ? "bg-green-400" : "bg-gray-200"
-                } `}
-              >
-                <div
-                  className={`absolute left-1 transition-transform duration-300 ease-in-out h-1 w-4 pt-4 mt-1 bg-white rounded-full  ${
-                    isRandomOrder ? "transform translate-x-full pt-4 mt-1" : ""
-                  }`}
-                ></div>
-              </div>
-              <span className="ml-2 font-abel">Random Order</span>
-            </label>
-          </div>
-          <div className="flex items-center">
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input
-                type="checkbox"
-                className="hidden toggle-checkbox"
-                checked={isFrontDisplayed}
-                onChange={() => dispatch(setDisplayOrder(!isFrontDisplayed))}
-              />
-              <div
-                className={`relative w-10 h-6 bg-gray-300 rounded-full transition-colors ${
-                  isFrontDisplayed ? "bg-green-400" : "bg-gray-200"
-                }`}
-              >
-                <div
-                  className={`absolute left-1 transition-transform duration-300 ease-in-out h-1 w-4 pt-4 mt-1 bg-white rounded-full ${
-                    isFrontDisplayed
-                      ? "transform translate-x-full pt-4 mt-1"
-                      : ""
-                  }`}
-                ></div>
-              </div>
-              <span className="ml-2 font-abel">Random Side</span>
-            </label>
-          </div>
-        </div>
+    <div className="flex-col justify-center items-center min-h-screen">
+      <h2 className="font-abel text-x mb-4 text-center justify-center">
+        {deckName}
+      </h2>
 
-        <div className="space-y-6 ml-4 sm:ml-10">
-          {languages.map((language) => (
-            <div
-              key={language.id}
-              className="border border-gray-200 p-4 rounded shadow-md mr-7"
-            >
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-2 text-center font-['Roboto']">
-                {language.id}
-              </h2>
-              <ul className="space-y-3 font-abel">
-                {language.decks.map((deck) => (
-                  <li key={deck.id} className="flex items-center space-x-3">
-                    <Link
-                      to={`/languages/${encodeURIComponent(
-                        language.id
-                      )}/decks/${encodeURIComponent(deck.name)}`}
-                      className="text-blue-500 hover:underline transition duration-300 ease-in-out transform hover:scale-105 text-lg sm:text-xl"
-                    >
-                      {deck.name}
-                    </Link>
-                    <button
-                      onClick={() => {
-                        addLanguageDeckAndHandleLike(language.id, deck.id)
-                      }}
-                      className={`px-4 py-2 rounded-full font-semibold ${
-                        deck.isLikedByUser
-                          ? "bg-green-400 text-white"
-                          : "bg-gray-200 text-gray-700"
-                      } hover:bg-opacity-80 transition-colors duration-300 flex items-center space-x-2`}
-                    >
-                      {deck.isLikedByUser ? (
-                        <>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            height="1em"
-                            viewBox="0 0 448 512"
-                          >
-                            <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z" />
-                          </svg>
-                          <div>Added</div>
-                        </>
-                      ) : (
-                        <>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            height="1em"
-                            viewBox="0 0 512 512"
-                          >
-                            <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H280v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z" />
-                          </svg>
-                          <div>Add</div>
-                        </>
-                      )}
-                    </button>
-                  </li>
-                ))}
-              </ul>
+      <div className="w-full mt-20 bg-white flex flex-col items-center text-3xl mt-40 font-abel">
+        {isFlipped ? (
+          <div className="mb-3 font-normal text-gray-900 dark:text-gray-700 flex flex-col items-center justify-center  overflow-hidden">
+            <p className="mb-1 font-normal text-gray-900 dark:text-gray-700  whitespace-pre-wrap ">
+              {currentFlashcard.front}
+            </p>
+            <hr className="w-screen h-0.5 bg-black my-3 border-none" />
+            <p className="mb-1 font-normal text-gray-900 dark:text-gray-700  whitespace-pre-wrap">
+              {currentFlashcard.back}
+            </p>
+          </div>
+        ) : (
+          <div className="mb-3 font-normal text-gray-900 dark:text-gray-700 flex flex-col items-center justify-center  overflow-hidden">
+            <div className="mb-3 font-normal text-gray-900 dark:text-gray-700 items-center text-center overflow-hidden flex-grow">
+              <div className="flex items-center justify-center h-full">
+                {isFrontDisplayed && Math.random() < 0.5 ? (
+                  <p className="whitespace-pre-wrap">{currentFlashcard.back}</p>
+                ) : (
+                  <p className="whitespace-pre-wrap">
+                    {currentFlashcard.front}
+                  </p>
+                )}
+              </div>
             </div>
-          ))}
-        </div>
+          </div>
+        )}
+      </div>
+
+      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex space-x-4 mt-4 font-abel">
+        {!isFlipped ? (
+          <button
+            className="text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 min-w-24 min-h-10 text-center mr-2 mb-2"
+            onClick={handleFlip}
+          >
+            Flip
+          </button>
+        ) : isLastFlashcard ? (
+          <Link
+            to="/"
+            className="mt-3 inline-flex items-center px-4 py-2 text-sm font-small text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-35"
+          >
+            Go to Decks
+          </Link>
+        ) : (
+          <button
+            className="text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 min-w-24 min-h-10 text-center mr-2 mb-2"
+            onClick={handleNextCard}
+          >
+            Next Card
+          </button>
+        )}
       </div>
     </div>
   );
 };
 
-export default Deck;
+export default Flashcards;
