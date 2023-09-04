@@ -97,7 +97,7 @@ const Dashboard = () => {
                 {language.userLikedDecks.map((deck) => (
                   <li key={deck.id} className="flex items-center space-x-3">
                     <Link
-                      to={`/languages/${encodeURIComponent(language.id)}/decks/${encodeURIComponent(deck.name)}`}
+                      to={`/languages/${encodeURIComponent(language.id)}/decks/${encodeURIComponent(deck.id)}`}
                       className="text-blue-500 hover:underline transition duration-300 ease-in-out transform hover:scale-105 text-lg sm:text-xl"
                     >
                       {deck.id}
