@@ -50,9 +50,6 @@ const Flashcards = () => {
       const flashcardsData = deckData.flashcards || [];
       flashcards.push(...flashcardsData);
     });
-    
-
-    
 
       const shuffledFlashcards = isRandomOrder
         ? shuffleArray(flashcards)
@@ -71,7 +68,7 @@ const Flashcards = () => {
     return () => {
       isMounted = false;
     };
-  }, [deckName, language, isRandomOrder]);
+  }, [deckName, language, isRandomOrder,userId]);
 
   if (shuffledFlashcards.length === 0) {
     return <div>Loading...</div>;

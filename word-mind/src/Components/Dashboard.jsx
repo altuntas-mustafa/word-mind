@@ -6,17 +6,67 @@ import { collection, getDocs } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebase';
 import { Link } from 'react-router-dom';
 import { addCurrentUserToUsersCollection, deleteDeckFromCollection } from '../JS/firebaseUtils';
+import OrderAndDisplaySide from './OrderAndDisplaySide';
 
 const Dashboard = () => {
   const user = useSelector(state => state.user);
-  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
   const [languageData, setLanguageData] = useState([]);
   const [currentUser, setcurrentUser] = useState("");
+  const dispatch = useDispatch();
+
+
+
 
   useEffect(() => {
     async function fetchUserInfoAsync() {
       await UserInfo(dispatch);
+      async function fetchUserLikedDecks() {
+        try {
+          setcurrentUser(auth.currentUser)
+    
+          if (!currentUser) {
+            // console.log('User not authenticated');
+            return;
+          }
+      
+          const userLanguageCollectionRef = collection(
+            db,
+            'users',
+            currentUser.uid,
+            'languages'
+          );
+      
+          const userLanguagesQuerySnapshot = await getDocs(userLanguageCollectionRef);
+      
+          const languageDataArray = [];
+      
+          for (const userLanguageDoc of userLanguagesQuerySnapshot.docs) {
+            const languageId = userLanguageDoc.id;
+            const userDeckCollectionRef = collection(
+              userLanguageDoc.ref,
+              'decks'
+            );
+            const userDeckQuerySnapshot = await getDocs(userDeckCollectionRef);
+      
+            const userLikedDecks = [];
+      
+            for (const userDeckDoc of userDeckQuerySnapshot.docs) {
+              const deckId = userDeckDoc.id;
+              const deckData = userDeckDoc.data();
+      
+              userLikedDecks.push({ id: deckId, ...deckData });
+            }
+      
+            if (userLikedDecks.length > 0) {
+              languageDataArray.push({ id: languageId, userLikedDecks });
+            }
+          }
+          setLanguageData(languageDataArray);
+        } catch (error) {
+          console.error('Error fetching user-liked decks:', error);
+        }
+      }
       await fetchUserLikedDecks();
       await addCurrentUserToUsersCollection();
 
@@ -93,7 +143,9 @@ const Dashboard = () => {
       ) : user.isAuthenticated ? (
         <>
           <h1>Welcome to the App, {user.displayName}!</h1>
+          <OrderAndDisplaySide />
           {languageData.map((language) => (
+            
             <div key={language.id}>
               <h2 className="text-2xl font-semibold mb-2">{language.id}</h2>
               <ul className="space-y-3">
