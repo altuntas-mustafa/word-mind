@@ -10,6 +10,7 @@ const SeeDeck = () => {
   const [localIsLiked, setLocalIsLiked] = useState(false); // Initialize with false
   const currentUser = auth.currentUser;
 
+  console.log(userId, deckName,language);
   useEffect(() => {
     let isMounted = true;
 
@@ -128,14 +129,21 @@ const SeeDeck = () => {
      
 
       {/* Conditional Button */}
-      <Link
-        to={`/review/${userId}/${encodeURIComponent(
-          language
-        )}/${encodeURIComponent(deckName)}`}
-        className="fixed bottom-0 left-0 w-full bg-blue-500 text-white py-3 text-center font-semibold hover:bg-blue-600 transition-colors duration-300"
-      >
-        Review
-      </Link>
+      {userId ? (
+        <Link
+          to={`/users/${userId}/languages/${encodeURIComponent(language)}/decks/${encodeURIComponent(deckName)}`}
+          className="fixed bottom-0 left-0 w-full bg-blue-500 text-white py-3 text-center font-semibold hover:bg-blue-600 transition-colors duration-300"
+        >
+          Review
+        </Link>
+      ):  (
+        <Link
+          to={`/languages/${encodeURIComponent(language)}/decks/${encodeURIComponent(deckName)}`}
+          className="fixed bottom-0 left-0 w-full bg-blue-500 text-white py-3 text-center font-semibold hover:bg-blue-600 transition-colors duration-300"
+        >
+          Review
+        </Link>
+      )}
     </div>
   );
 };

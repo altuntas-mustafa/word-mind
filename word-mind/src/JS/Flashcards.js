@@ -120,12 +120,23 @@ const Flashcards = () => {
             Flip
           </button>
         ) : isLastFlashcard ? (
-          <Link
-            to="/"
-            className="mt-3 inline-flex items-center px-4 py-2 text-sm font-small text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-35"
-          >
-            Go to Decks
-          </Link>
+          <>
+          {userId ? (
+            <Link
+              to="/dashboard" // Redirect to dashboard if userId is present
+              className="mt-3 inline-flex items-center px-4 py-2 text-sm font-small text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-35"
+            >
+              Go to Dashboard
+            </Link>
+          ) : (
+            <Link
+              to="/" // Redirect to the root path if userId is not present
+              className="mt-3 inline-flex items-center px-4 py-2 text-sm font-small text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-35"
+            >
+              Go to Decks
+            </Link>
+          )}
+          </>
         ) : (
           <button
             className="text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 min-w-24 min-h-10 text-center mr-2 mb-2"
