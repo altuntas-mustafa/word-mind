@@ -41,7 +41,7 @@ const Deck = () => {
           DECK LISTS
         </h1>
         <OrderAndDisplaySide />
-  
+
         <div className="space-y-6 ml-4 sm:ml-10">
           {languages.map((language) => (
             <div
@@ -55,7 +55,7 @@ const Deck = () => {
                 {language.decks.map((deck) => (
                   <li key={deck.id} className="flex items-center space-x-3">
                     <Link
-                      to={`/languages/${encodeURIComponent(
+                      to={`/deck/languages/${encodeURIComponent(
                         language.id
                       )}/decks/${encodeURIComponent(deck.name)}`}
                       className="text-blue-500 hover:underline transition duration-300 ease-in-out transform hover:scale-105 text-lg sm:text-xl"
@@ -108,7 +108,7 @@ const Deck = () => {
                         {deck.creatorUser === auth.currentUser.uid ? (
                           <button
                             onClick={() => {
-                              handleDeleteClick(language.id, deck.id)
+                              handleDeleteClick(language.id, deck.id);
                             }}
                             className="px-4 py-2 rounded-full font-semibold bg-red-500 text-white hover:bg-red-600 transition-colors duration-300 flex items-center space-x-2"
                           >
@@ -136,7 +136,6 @@ const Deck = () => {
       </div>
     </div>
   );
-  
 };
 
 export default Deck;

@@ -13,6 +13,7 @@ import Header from './Components/Header';
 
 import AddDeck from './JS/AddDeck';
 import Flashcards from './JS/Flashcards';
+import SeeDeck from './JS/SeeDeck';
 
 
 function App() {
@@ -30,6 +31,8 @@ function App() {
             <Route path="/logout" element={<Logout />} />
             <Route path="/languages/:language/decks/:deckName" element={<Flashcards />} />
             <Route path="/users/:userId/languages/:language/decks/:deckName" element={<Flashcards />} />
+            <Route path="/deck/users/:userId/languages/:language/decks/:deckName" element={<SeeDeck />} />
+            <Route path="/deck/languages/:language/decks/:deckName" element={<SeeDeck />} />
           </Routes>
         </div>
       </Router>
