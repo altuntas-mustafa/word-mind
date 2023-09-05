@@ -32,7 +32,7 @@ function App() {
             <Route path="/languages/:language/decks/:deckName" element={<Flashcards />} />
             <Route path="/users/:userId/languages/:language/decks/:deckName" element={<Flashcards />} />
             <Route path="/deck/users/:userId/languages/:language/decks/:deckName" element={<SeeDeck />} />
-            <Route path="/deck/languages/:language/decks/:deckName" element={<SeeDeck />} />
+            <Route path="/deck/languages/:language/decks/:isLiked/:deckName" element={<SeeDeck />} />
           </Routes>
         </div>
       </Router>

@@ -2,19 +2,25 @@ import React, { useState, useEffect } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { auth, db } from "../firebase/firebase";
 import { useParams, Link } from "react-router-dom";
+import { addLanguageDeckAndHandleLike } from "./firebaseUtils";
 
 const SeeDeck = () => {
-  const { userId, deckName, language } = useParams();
+  const { userId, deckName, language, isLiked } = useParams();
   const [deckFlashcards, setDeckFlashcards] = useState([]);
-  const [currentUser, setcurrentUser] = useState("");
+  const [localIsLiked, setLocalIsLiked] = useState(false); // Initialize with false
+  const currentUser = auth.currentUser;
 
   useEffect(() => {
     let isMounted = true;
+
+    // Set localIsLiked based on the initial value of isLiked
+    setLocalIsLiked(isLiked === "true");
+
     const fetchFlashcards = async () => {
-      setcurrentUser(auth.currentUser)
-      const collectionPath = userId !== undefined
-        ? `users/${userId}/languages/${language}/decks`
-        : `languages/${language}/decks`;
+      const collectionPath =
+        userId !== undefined
+          ? `users/${userId}/languages/${language}/decks`
+          : `languages/${language}/decks`;
 
       const flashcardsQuerySnapshot = await getDocs(
         query(collection(db, collectionPath), where("name", "==", deckName))
@@ -28,7 +34,10 @@ const SeeDeck = () => {
         const flashcardsData = deckData.flashcards || [];
         flashcards.push(...flashcardsData);
       });
-      setDeckFlashcards(flashcards);
+
+      if (isMounted) {
+        setDeckFlashcards(flashcards);
+      }
     };
 
     fetchFlashcards().catch((error) => {
@@ -38,11 +47,62 @@ const SeeDeck = () => {
     return () => {
       isMounted = false;
     };
-  }, [deckName, language, userId]);
+  }, [deckName, language, userId, isLiked]);
+
+  const handleLikeClick = async (languageId, deckId) => {
+    try {
+      await addLanguageDeckAndHandleLike(languageId, deckId);
+      setLocalIsLiked(!localIsLiked);
+    } catch (error) {
+      console.error("Error while adding/deleting deck:", error);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <h2 className="text-2xl font-semibold mb-4 text-center">{deckName}</h2>
+      <h2 className="text-2xl font-semibold mb-4 text-center flex items-center">
+        {deckName}
+        {currentUser && !userId && (
+          <button
+            onClick={() => {
+              try {
+                handleLikeClick(language, deckName);
+              } catch (error) {
+                console.error("Error while adding/deleting deck:", error);
+              }
+            }}
+            className={`ml-2 px-4 py-2 rounded-full font-semibold ${
+              localIsLiked
+                ? "bg-green-400 text-white"
+                : "bg-gray-200 text-gray-700"
+            } hover:bg-opacity-80 transition-colors duration-300 flex items-center space-x-2`}
+          >
+            {localIsLiked ? (
+              <>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  height="1em"
+                  viewBox="0 0 448 512"
+                >
+                  <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z" />
+                </svg>
+                <div>Liked</div>
+              </>
+            ) : (
+              <>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  height="1em"
+                  viewBox="0 0 512 512"
+                >
+                  <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0-14 10.7 24-24s24 10.7 24 24H280v64c0-13.3-10.7-24-24-24s-14-10.7 24-24z" />
+                </svg>
+                <div>Like</div>
+              </>
+            )}
+          </button>
+        )}
+      </h2>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {deckFlashcards.map((flashcard, index) => (
           <div
@@ -65,22 +125,17 @@ const SeeDeck = () => {
           </div>
         ))}
       </div>
+     
+
       {/* Conditional Button */}
-      {userId ? (
-        <Link
-          to={`/review/${userId}/${encodeURIComponent(language)}/${encodeURIComponent(deckName)}`}
-          className="fixed bottom-0 left-0 w-full bg-blue-500 text-white py-3 text-center font-semibold hover:bg-blue-600 transition-colors duration-300"
-        >
-          Review
-        </Link>
-      ) : (
-        <Link
-          to={`/users/${encodeURIComponent(currentUser.uid)}/languages/${encodeURIComponent(language)}/decks/${encodeURIComponent(deckName)}`}
-          className="fixed bottom-0 left-0 w-full bg-blue-500 text-white py-3 text-center font-semibold hover:bg-blue-600 transition-colors duration-300"
-        >
-          Add to Your List
-        </Link>
-      )}
+      <Link
+        to={`/review/${userId}/${encodeURIComponent(
+          language
+        )}/${encodeURIComponent(deckName)}`}
+        className="fixed bottom-0 left-0 w-full bg-blue-500 text-white py-3 text-center font-semibold hover:bg-blue-600 transition-colors duration-300"
+      >
+        Review
+      </Link>
     </div>
   );
 };
