@@ -10,7 +10,6 @@ const SeeDeck = () => {
   const [localIsLiked, setLocalIsLiked] = useState(false); // Initialize with false
   const currentUser = auth.currentUser;
 
-  console.log(userId, deckName,language);
   useEffect(() => {
     let isMounted = true;
 
