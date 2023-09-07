@@ -63,9 +63,9 @@ const Deck = () => {
                           deck.isLikedByUser
                         )}/${encodeURIComponent(deck.name)}/notcreator`
                     }
-                    className="flex items-center space-x-3 w-full"
+                    className="flex items-center space-x-3 w-full sm:text-sm"
                   >
-                    <div className="flex-grow inline-flex items-center h-20 px-5 duration-150 bg-gradient-to-r from-blue-600 via-blue-300 to-green-300 border-b border-gray-400 rounded-lg focus:shadow-outline hover:bg-gray-400 text-2xl text-white font-semibold">
+                    <div className="flex-grow inline-flex items-center h-20 px-5 duration-150 bg-gradient-to-r from-blue-600 via-blue-300 to-green-300 border-b border-gray-400 rounded-lg focus:shadow-outline hover:bg-gray-400 text-2xl text-white font-semibold sm:text-sm ">
                       {deck.name}
                       <span className="text-5xl ml-auto">&gt;</span>
                     </div>
