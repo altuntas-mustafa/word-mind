@@ -41,33 +41,37 @@ const Deck = () => {
                 {language.id}
               </h2>
               <ul className="space-y-3 font-abel">
-                {language.decks.map((deck) => (
-                  <Link
-                    key={deck.id}
-                    to={
-                      deck.creatorUser === auth.currentUser.uid
-                        ? `/deck/languages/${encodeURIComponent(
-                          language.id
-                        )}/decks/${encodeURIComponent(
-                          deck.isLikedByUser
-                        )}/${encodeURIComponent(deck.name)}/creator`
-                        : `/deck/languages/${encodeURIComponent(
-                          language.id
-                        )}/decks/${encodeURIComponent(
-                          deck.isLikedByUser
-                        )}/${encodeURIComponent(deck.name)}/notcreator`
-                    }
-                    className="flex items-center space-x-3 w-full"
-                  >
-                    <div className="flex-grow inline-flex items-center h-20 px-5 duration-150 bg-gradient-to-r from-blue-600 via-blue-300 to-green-300 border-b border-gray-400 rounded-lg focus:shadow-outline hover:bg-gray-400 text-2xl text-white font-semibold">
-                      {deck.name}
-                      <span className="text-5xl ml-auto">&gt;</span>
-                    </div>
-                  </Link>
-                ))}
-              </ul>
-
-
+  {language.decks.map((deck) => (
+    <Link
+      key={deck.id}
+      to={
+        auth.currentUser
+          ? deck.creatorUser === auth.currentUser.uid
+            ? `/deck/languages/${encodeURIComponent(
+                language.id
+              )}/decks/${encodeURIComponent(
+                deck.isLikedByUser
+              )}/${encodeURIComponent(deck.name)}/creator`
+            : `/deck/languages/${encodeURIComponent(
+                language.id
+              )}/decks/${encodeURIComponent(
+                deck.isLikedByUser
+              )}/${encodeURIComponent(deck.name)}/notcreator`
+          : `/deck/languages/${encodeURIComponent(
+              language.id
+            )}/decks/${encodeURIComponent(
+              deck.isLikedByUser
+            )}/${encodeURIComponent(deck.name)}/notcreator`
+      }
+      className="flex items-center space-x-3 w-full"
+    >
+      <div className="flex-grow inline-flex items-center h-20 px-5 duration-150 bg-gradient-to-r from-blue-600 via-blue-300 to-green-300 border-b border-gray-400 rounded-lg focus:shadow-outline hover:bg-gray-400 text-2xl text-white font-semibold">
+        {deck.name}
+        <span className="text-5xl ml-auto">&gt;</span>
+      </div>
+    </Link>
+  ))}
+</ul>
 
 
 
