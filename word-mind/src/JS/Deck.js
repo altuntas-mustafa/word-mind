@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   fetchLanguagesAndDecksFromFirebase,
-  deleteDeckFromCollection,
 } from "./firebaseUtils";
 import { auth } from "../firebase/firebase";
 import OrderAndDisplaySide from "../Components/OrderAndDisplaySide";
@@ -14,15 +13,15 @@ const Deck = () => {
     fetchLanguagesAndDecksFromFirebase(setLanguages);
   }, []); // Empty dependency array, so it runs only once on initial mount
 
-  const handleDeleteClick = async (languageId, deckId) => {
-    try {
-      await deleteDeckFromCollection(languageId, deckId, false);
-      // Refetch languages and decks after successful addition/deletion
-      fetchLanguagesAndDecksFromFirebase(setLanguages);
-    } catch (error) {
-      console.error("Error while adding/deleting deck:", error);
-    }
-  };
+  // const handleDeleteClick = async (languageId, deckId) => {
+  //   try {
+  //     await deleteDeckFromCollection(languageId, deckId, false);
+  //     // Refetch languages and decks after successful addition/deletion
+  //     fetchLanguagesAndDecksFromFirebase(setLanguages);
+  //   } catch (error) {
+  //     console.error("Error while adding/deleting deck:", error);
+  //   }
+  // };
 
   return (
     <div className="p-5 min-h-screen  flex justify-center ">
@@ -43,42 +42,35 @@ const Deck = () => {
               </h2>
               <ul className="space-y-3 font-abel">
                 {language.decks.map((deck) => (
-                  <li key={deck.id} className="flex items-center space-x-3">
-                    <Link
-                      to={`/deck/languages/${encodeURIComponent(
-                        language.id
-                      )}/decks/${encodeURIComponent(deck.isLikedByUser)}/${encodeURIComponent(deck.name)}`}
-                      className="text-blue-500 hover:underline transition duration-300 ease-in-out transform hover:scale-105 text-lg sm:text-xl"
-                    >
+                  <Link
+                    key={deck.id}
+                    to={
+                      deck.creatorUser === auth.currentUser.uid
+                        ? `/deck/languages/${encodeURIComponent(
+                          language.id
+                        )}/decks/${encodeURIComponent(
+                          deck.isLikedByUser
+                        )}/${encodeURIComponent(deck.name)}/creator`
+                        : `/deck/languages/${encodeURIComponent(
+                          language.id
+                        )}/decks/${encodeURIComponent(
+                          deck.isLikedByUser
+                        )}/${encodeURIComponent(deck.name)}/notcreator`
+                    }
+                    className="flex items-center space-x-3 w-full"
+                  >
+                    <div className="flex-grow inline-flex items-center h-20 px-5 duration-150 bg-gradient-to-r from-blue-600 via-blue-300 to-green-300 border-b border-gray-400 rounded-lg focus:shadow-outline hover:bg-gray-400 text-2xl text-white font-semibold">
                       {deck.name}
-                    </Link>
-                    {auth.currentUser ? (
-                      <div className="flex items-center space-x-2">
-                        {deck.creatorUser === auth.currentUser.uid ? (
-                          <button
-                            onClick={() => {
-                              handleDeleteClick(language.id, deck.id);
-                            }}
-                            className="px-4 py-2 rounded-full font-semibold bg-red-500 text-white hover:bg-red-600 transition-colors duration-300 flex items-center space-x-2"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              height="1em"
-                              viewBox="0 0 448 512"
-                            >
-                              <path
-                                fill="currentColor"
-                                d="M364 24H84c-22.1 0-40 17.9-40 40v384c0 22.1 17.9 40 40 40h280c22.1 0-40-17.9-40-40V64c0-22.1-17.9-40-40-40zm-16 392c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16v224zm-64 0c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16v224zm-64 0c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16v224zm-64 0c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16v224z"
-                              ></path>
-                            </svg>
-                            <div>Delete From EveryOne</div>
-                          </button>
-                        ) : null}
-                      </div>
-                    ) : null}
-                  </li>
+                      <span className="text-5xl ml-auto">&gt;</span>
+                    </div>
+                  </Link>
                 ))}
               </ul>
+
+
+
+
+
             </div>
           ))}
         </div>
