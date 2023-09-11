@@ -26,6 +26,7 @@ export const handleSubmit = async (
     setIsErrorPopupVisible(true);
     return;
   }
+  console.log(deckInfo.cards);
   if (
     deckInfo.cards.some(
       (card) => (card.front.trim() + "" + card.back.trim()).split("").length < 2
@@ -74,12 +75,17 @@ export const handleSubmit = async (
     const flashcardsCollectionRef = collection(deckDocRef, "flashcards");
     await Promise.all(
       deckInfo.cards.map(async (card) => {
+
+        // Add the card document to Firestore with the updated memoriseLevel and averageLevel
         await addDoc(flashcardsCollectionRef, {
           front: card.front,
           back: card.back,
+          memoriseLevel: [5], // Use the updated memoriseLevel
+          averageLevel: 5, // Store the calculated averageLevel
         });
       })
     );
+
 
     // Call addLanguageDeckAndHandleLike to add the deck to the user's collection
     await addLanguageDeckAndHandleLike(deckInfo.language, deckInfo.deckName);
@@ -117,15 +123,15 @@ export async function addLanguageDeckAndHandleLike(languageId, deckId) {
     if (deckDocSnapshot.exists()) {
       const flashcardsCollectionRef = collection(deckDocRef, "flashcards");
       const flashcardsQuerySnapshot = await getDocs(flashcardsCollectionRef);
-      
-      
+
+
       const userLanguageCollection = collection(
         db,
         "users",
         currentUser.uid,
         "languages"
       );
-          // Check if the language already exists
+      // Check if the language already exists
       const languageDocRef = doc(userLanguageCollection, languageId);
       const languageDocSnapshot = await getDoc(languageDocRef);
 
@@ -147,7 +153,7 @@ export async function addLanguageDeckAndHandleLike(languageId, deckId) {
 
       await setDoc(
         userDeckDoc,
-        { 
+        {
           flashcards: flashcardsData,
           name: deckId
         },
@@ -214,7 +220,7 @@ export async function deleteDeckFromCollection(languageId, deckId, isUserCollect
       const languageDocPath = isUserCollection
         ? `users/${currentUser.uid}/languages/${languageId}`
         : `languages/${languageId}`;
-      
+
       try {
         const languageDoc = doc(db, languageDocPath);
         await deleteDoc(languageDoc);
@@ -222,7 +228,7 @@ export async function deleteDeckFromCollection(languageId, deckId, isUserCollect
         console.error("Error deleting language:", error);
       }
     }
-    if(isUserCollection){
+    if (isUserCollection) {
       addLanguageDeckAndHandleLike(languageId, deckId);
     }
   } catch (error) {
@@ -233,7 +239,7 @@ export async function deleteDeckFromCollection(languageId, deckId, isUserCollect
 
 export async function fetchLanguagesAndDecksFromFirebase(setLanguages) {
   const languagesCollectionRef = collection(db, "languages");
-  
+
   try {
     const languagesQuerySnapshot = await getDocs(languagesCollectionRef);
     const languagesData = [];
@@ -272,6 +278,72 @@ export async function fetchLanguagesAndDecksFromFirebase(setLanguages) {
     setLanguages(languagesData);
   } catch (error) {
     console.error("Error fetching languages and decks:", error);
+  }
+}
+
+
+
+export async function changeWordLevel(userId, languageId, deckName, cardId, level) {
+  console.log(userId);
+  try {
+    // Get a reference to the user's document
+    const userDocRef = doc(collection(db, "users"), userId);
+
+    // Check if the language document exists
+    const languageDocRef = doc(userDocRef, "languages", languageId);
+
+    // Check if the deck document exists within the language
+    const deckQuery = query(
+      collection(languageDocRef, "decks"),
+      where("name", "==", deckName)
+    );
+
+    const deckQuerySnapshot = await getDocs(deckQuery);
+    const deckDoc = deckQuerySnapshot.docs[0];
+
+    if (deckDoc) {
+      // // Construct the path to the flashcard within the deck
+      // const flashcardPath = `flashcards.${cardId}`;
+
+      // Get the current flashcard data
+      const flashcardDocRef = doc(deckDoc.ref, "flashcards", cardId); // Updated path
+
+      const flashcardDocSnapshot = await getDoc(flashcardDocRef);
+
+      if (flashcardDocSnapshot.exists()) {
+        // Flashcard data exists, update it
+        const flashcardData = flashcardDocSnapshot.data();
+
+        // Update the memoriseLevel array for the specific flashcard
+        const memoriseLevelArray = flashcardData.memoriseLevel || [];
+        memoriseLevelArray.push(level);
+
+        // Calculate the average level
+        const averageLevel = memoriseLevelArray.reduce((acc, val) => acc + val, 0) / memoriseLevelArray.length;
+
+        // Update the flashcard data with the new memoriseLevel and averageLevel
+        await updateDoc(flashcardDocRef, {
+          memoriseLevel: memoriseLevelArray,
+          averageLevel: averageLevel,
+        });
+
+        console.log(`Updated flashcard ${cardId} with level ${level} and averageLevel ${averageLevel}`);
+      } else {
+        // Flashcard data doesn't exist, create it
+        const newFlashcardData = {
+          memoriseLevel: [level],
+          averageLevel: level, // Set initial average level to the same as the level
+        };
+
+        await setDoc(flashcardDocRef, newFlashcardData);
+
+        console.log(`Created flashcard ${cardId} with level ${level} and averageLevel ${level}`);
+      }
+    } else {
+      console.error(`Deck '${deckName}' not found in language '${languageId}' for user '${userId}'.`);
+    }
+  } catch (error) {
+    console.error('Error updating flashcard level:', error);
   }
 }
 

@@ -18,6 +18,7 @@ const AddDeck = () => {
     cards: [
       { front: '', back: '' },
       { front: '', back: '' },
+      {memoriseLevel: 5},
     ],
   });
 
