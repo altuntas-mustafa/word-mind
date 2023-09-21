@@ -73,6 +73,7 @@ const SeeDeck = () => {
   };
 
   return (
+    <div className=" bg-gray-300 rounded-lg shadow-md justify-center items-center">
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <h2 className="text-2xl font-semibold mb-4 text-center flex items-center justify-center md:text-xl sm:text-sm">
         <span className="lg:text-2xl md:text-xl">
@@ -254,6 +255,7 @@ const SeeDeck = () => {
           Review
         </Link>
       )}
+    </div>
     </div>
   );
 };
