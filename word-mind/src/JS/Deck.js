@@ -65,10 +65,12 @@ const Deck = () => {
                     }
                     className="flex items-center space-x-3 w-full sm:text-sm"
                   >
-                    <div className="flex-grow inline-flex items-center h-20 px-5 duration-150 bg-gradient-to-r from-blue-600 via-blue-300 to-green-300 border-b border-gray-400 rounded-lg focus:shadow-outline hover:bg-gray-400 text-2xl text-white font-semibold sm:text-sm ">
+                    <div className="flex-1 inline-flex items-center h-20 px-5 duration-150 bg-gradient-to-r from-blue-600 via-blue-300 to-green-300 border-b border-gray-400 rounded-lg focus:shadow-outline hover:bg-gray-400 text-0.1l lg:text-2xl text-white font-semibold">
                       {deck.name}
-                      <span className="text-5xl ml-auto">&gt;</span>
+                      <span className="text-3xl md:text-4xl  lg:text-5xl ml-auto">&gt;</span>
                     </div>
+
+
                   </Link>
                 ))}
               </ul>

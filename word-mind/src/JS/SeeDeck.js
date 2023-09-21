@@ -217,7 +217,7 @@ const SeeDeck = () => {
               <p className="text-2xl text-green-600 font-bold uppercase">
                 {flashcard.back}
               </p>
-              {userId && (
+              {/* {userId && (
                   <>
                   {flashcard.averageLevel === 5 && (
                     <>
@@ -228,7 +228,7 @@ const SeeDeck = () => {
                   </>
                    )}
                   </>
-              )}
+              )} */}
             </div>
           </div>
         ))}
