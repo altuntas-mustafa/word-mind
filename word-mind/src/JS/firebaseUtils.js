@@ -29,7 +29,7 @@ export const handleSubmit = async (
   console.log(deckInfo.cards);
   if (
     deckInfo.cards.some(
-      (card) => (card.front.trim() + "" + card.back.trim()).split("").length < 2
+      (card) => (card.front.trim() + "" + card.back.trim()).split("").length < 1
     )
   ) {
     setErrorMessage(
